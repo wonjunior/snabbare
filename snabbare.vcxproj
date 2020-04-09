@@ -86,6 +86,14 @@
     <ClCompile Include="common\Windows\glew.c" />
     <ClCompile Include="common\Windows\MicroGlut.c" />
     <ClCompile Include="snabbare.c" />
+    <ClCompile Include="Terrain.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lab4-6.frag" />
+    <None Include="lab4-6.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Terrain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
