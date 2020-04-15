@@ -35,7 +35,7 @@ void drawCar(Car* car) {
 
     //texture
     //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, car->texture);
+    glBindTexture(GL_TEXTURE_2D, car->texture);
     //glUniform1i(glGetUniformLocation(car->shader, "texUnit"), 0);
 
     mat4 modelToWorld = T(car->pos.x, car->pos.y, car->pos.z);

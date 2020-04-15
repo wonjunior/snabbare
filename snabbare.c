@@ -213,19 +213,19 @@ void init(void)
     glUseProgram(program);
 
     // ------------------- textures loading
-    LoadTGATextureSimple("maskros512.tga", &grassTexture);
+    LoadTGATextureSimple("textures/maskros512.tga", &grassTexture);
     glUniform1i(glGetUniformLocation(program, "texUnit"), 0); 		// Texture unit 0
     glActiveTexture(GL_TEXTURE0);
 
     // ------------------- Load skybox
-    skybox = CreateSkybox("skybox.obj", "SkyBox512.tga", program);
+    skybox = CreateSkybox("models/skybox.obj", "textures/SkyBox512.tga", program);
  
 
     // ------------------- Load models
-    subaru = loadCar(program, "fiat.obj", "orange.tga");
-    subaru->pos.x = 0;
-    subaru->pos.y = 0;
-    subaru->pos.z = 0;
+    subaru = loadCar(program, "models/fiat.obj", "textures/orange.tga");
+    subaru->pos.x = 50;
+    subaru->pos.y = 10;
+    subaru->pos.z = 50;
 
 
     //ProjectionMatrix = frustum(-0.5, 0.5, -0.5, 0.5, 1.0, 30.0);
@@ -239,7 +239,7 @@ void init(void)
     glUniform1iv(glGetUniformLocation(program, "isDirectional"), 4, isDirectional);
 
     
-    terrain = GenerateTerrain(program, "fft-terrain.tga");
+    terrain = GenerateTerrain(program, "textures/fft-terrain.tga");
 }
 
 GLfloat a, b = 0.0;
