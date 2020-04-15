@@ -85,7 +85,10 @@
     <ClCompile Include="common\VectorUtils3.c" />
     <ClCompile Include="common\Windows\glew.c" />
     <ClCompile Include="common\Windows\MicroGlut.c" />
+    <ClCompile Include="Car.c" />
+    <ClCompile Include="Skybox.c" />
     <ClCompile Include="snabbare.c" />
+    <ClCompile Include="Sphere.c" />
     <ClCompile Include="Terrain.c" />
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +96,9 @@
     <None Include="lab4-6.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Car.h" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="Sphere.h" />
     <ClInclude Include="Terrain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
