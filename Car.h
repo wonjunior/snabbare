@@ -13,10 +13,11 @@ typedef struct {
     GLuint texture;
     GLuint shader;
     vec3 pos;
-    vec3 speed;
+    vec3 direction;
     vec3 front;
     vec3 up;
     mat4 rotation;
+    float speed;
 } Car;
 
 Car* loadCar(GLuint shader, char* model, char* texture);

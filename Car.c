@@ -1,15 +1,5 @@
 #include "Car.h"
-/*
-typedef struct {
-    Model* model;
-    TextureData textureMap;
-    GLuint shader;
-    vec3 pos;
-    vec3 speed;
-    vec3 front;
-    vec3 up;
-} Car;
-*/
+
 
 Car* loadCar(GLuint shader, char* modelFile, char textureFile[])
 {
@@ -33,14 +23,14 @@ Car* loadCar(GLuint shader, char* modelFile, char textureFile[])
     car->front.x = 0;
     car->front.y = 0;
     car->front.z = 1;
-    car->speed.x = 0;
-    car->speed.y = 0;
-    car->speed.z = 0.5;
+    car->direction.x = 0;
+    car->direction.y = 0;
+    car->direction.z = 0.5;
     car->up.x = 0;
     car->up.y = 1;
     car->up.z = 0;
     car->rotation = IdentityMatrix();
-
+    car->speed = 0.05;
     return car;
 }
 

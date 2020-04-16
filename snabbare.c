@@ -49,6 +49,9 @@ typedef struct {
     float tilt;
 } Camera;
 
+enum {CTRL_GAS, CTRL_BRAKE, CTRL_LEFT, CTRL_RIGHT};
+char controls[4] = { 0, 0, 0, 0 };
+
 Skybox* skybox;
 Terrain* terrain;
 
@@ -119,10 +122,29 @@ void LoadMatrixToUniform(const char* variableName, mat4 matrix)
     glUniformMatrix4fv(glGetUniformLocation(program, variableName), 1, GL_TRUE, matrix.m);
 }
 
-void OnTimer(int value)
+void updateCar()
 {
-    glutPostRedisplay();
-    glutTimerFunc(20, &OnTimer, value);
+    subaru->pos = VectorAdd(subaru->pos, ScalarMult(Normalize(subaru->direction), subaru->speed));
+    float turningSensibility = 0.01;
+
+    if (controls[CTRL_GAS]) {
+        subaru->speed += 0.001;
+    }
+    if (controls[CTRL_BRAKE]) {
+        subaru->speed -= 0.001;
+    }
+    if (controls[CTRL_LEFT]) {
+        subaru->direction = MultVec3(Ry(turningSensibility), subaru->direction);
+        subaru->front = MultVec3(Ry(turningSensibility), subaru->front);
+        subaru->rotation = Mult(subaru->rotation, Ry(turningSensibility));
+    }
+    if (controls[CTRL_RIGHT]) {
+        subaru->direction = MultVec3(Ry(-turningSensibility), subaru->direction);
+        subaru->front = MultVec3(Ry(-turningSensibility), subaru->front);
+        subaru->rotation = Mult(subaru->rotation, Ry(-turningSensibility));
+    }
+
+
 }
 
 void mouseHandler(int x, int y)
@@ -151,11 +173,29 @@ void mouseHandler(int x, int y)
     }
 }
 
+void keyUpHandler(unsigned char key, int x, int y) {
+    switch (key)
+    {
+            // car control
+        case 'z':
+            controls[CTRL_GAS] = 0;
+            break;
+        case 's':
+            controls[CTRL_BRAKE] = 0;
+            break;
+        case 'q':
+            controls[CTRL_LEFT] = 0;
+            break;
+        case 'd':
+            controls[CTRL_RIGHT] = 0;
+            break;
+    }
+}
+
 void keyHandler(unsigned char key, int x, int y)
 {
     float step = 3;
     vec3 left = Normalize(CrossProduct(camera.up, camera.forward)); // basis (up, forward, left)
-    float turningSensibility = 0.1;
 
     switch (key) {
     case 'i':
@@ -191,20 +231,16 @@ void keyHandler(unsigned char key, int x, int y)
 
         // car control
     case 'z':
-        subaru->pos = VectorAdd(subaru->pos, subaru->speed);
+        controls[CTRL_GAS] = 1;
         break;
     case 's':
-        subaru->pos = VectorSub(subaru->pos, subaru->speed);
+        controls[CTRL_BRAKE] = 1;
         break;
     case 'q':
-        subaru->speed = MultVec3(Ry(turningSensibility), subaru->speed);
-        subaru->front = MultVec3(Ry(turningSensibility), subaru->front);
-        subaru->rotation = Mult(subaru->rotation, Ry(turningSensibility));
+        controls[CTRL_LEFT] = 1;
         break;
     case 'd':
-        subaru->speed = MultVec3(Ry(-turningSensibility), subaru->speed);
-        subaru->front = MultVec3(Ry(-turningSensibility), subaru->front);
-        subaru->rotation = Mult(subaru->rotation, Ry(-turningSensibility));
+        controls[CTRL_RIGHT] = 1;
         break;
 
 
@@ -318,6 +354,8 @@ void display(void)
         DrawNormals(terrain);
 
 
+    updateCar();
+
     drawCar(subaru);
 
 
@@ -385,7 +423,9 @@ int main(int argc, char* argv[])
     glutDisplayFunc(display);
     glutPassiveMotionFunc(mouseHandler);
     glutKeyboardFunc(keyHandler);
+    glutKeyboardUpFunc(keyUpHandler);
     glutRepeatingTimer(20);
+    //glutTimerFunc(20, &OnTimer, 0);
    
 
     glutMainLoop();
