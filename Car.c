@@ -27,6 +27,19 @@ Car* loadCar(GLuint shader, char* modelFile, char textureFile[])
 
     LoadTGATextureSimple(textureFile, &(car->texture));
 
+    car->pos.x = 50;
+    car->pos.y = 10;
+    car->pos.z = 50;
+    car->front.x = 0;
+    car->front.y = 0;
+    car->front.z = 1;
+    car->speed.x = 0;
+    car->speed.y = 0;
+    car->speed.z = 0.5;
+    car->up.x = 0;
+    car->up.y = 1;
+    car->up.z = 0;
+    car->rotation = IdentityMatrix();
 
     return car;
 }
@@ -38,7 +51,7 @@ void drawCar(Car* car) {
     glBindTexture(GL_TEXTURE_2D, car->texture);
     //glUniform1i(glGetUniformLocation(car->shader, "texUnit"), 0);
 
-    mat4 modelToWorld = T(car->pos.x, car->pos.y, car->pos.z);
+    mat4 modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), car->rotation);
 
 
     glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);

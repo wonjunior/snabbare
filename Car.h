@@ -16,6 +16,7 @@ typedef struct {
     vec3 speed;
     vec3 front;
     vec3 up;
+    mat4 rotation;
 } Car;
 
 Car* loadCar(GLuint shader, char* model, char* texture);

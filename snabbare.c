@@ -140,7 +140,7 @@ void keyHandler(unsigned char key, int x, int y)
 {
     float step = 1;
     vec3 left = Normalize(CrossProduct(up, forward)); // basis (up, forward, left)
-    float objSpeed = 0.5;
+    float turningSensibility = 0.1;
 
     switch (key) {
     case 'z':
@@ -163,25 +163,24 @@ void keyHandler(unsigned char key, int x, int y)
         cam.y += step;
         break;
 
-        // lapinous control
+        // car control
     case 'i':
-        subaru->pos.x += objSpeed;
+        subaru->pos = VectorAdd(subaru->pos, subaru->speed);
         break;
     case 'k':
-        subaru->pos.x -= objSpeed;
+        subaru->pos = VectorSub(subaru->pos, subaru->speed);
         break;
     case 'j':
-        subaru->pos.z += objSpeed;
+        subaru->speed = MultVec3(Ry(turningSensibility), subaru->speed);
+        subaru->front = MultVec3(Ry(turningSensibility), subaru->front);
+        subaru->rotation = Mult(subaru->rotation, Ry(turningSensibility));
         break;
     case 'l':
-        subaru->pos.z -= objSpeed;
+        subaru->speed = MultVec3(Ry(-turningSensibility), subaru->speed);
+        subaru->front = MultVec3(Ry(-turningSensibility), subaru->front);
+        subaru->rotation = Mult(subaru->rotation, Ry(-turningSensibility));
         break;
-    case 'o':
-        subaru->pos.y += objSpeed;
-        break;
-    case 'u':
-        subaru->pos.y -= objSpeed;
-        break;
+
 
         // terrain nromals
     case 'n':
@@ -223,9 +222,7 @@ void init(void)
 
     // ------------------- Load models
     subaru = loadCar(program, "models/fiat.obj", "textures/orange.tga");
-    subaru->pos.x = 50;
-    subaru->pos.y = 10;
-    subaru->pos.z = 50;
+
 
 
     //ProjectionMatrix = frustum(-0.5, 0.5, -0.5, 0.5, 1.0, 30.0);
