@@ -18,4 +18,4 @@ typedef struct {
 Terrain* GenerateTerrain(GLuint shader, char* textureFileName);
 
 void DrawNormals(Terrain* terrain);
-void DrawTerrain(Terrain* terrain, mat4 modelToWorld, mat4 worldToView);
+void DrawTerrain(Terrain* terrain, mat4 modelToWorld);

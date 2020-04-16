@@ -124,10 +124,9 @@ void DrawNormals(Terrain* terrain)
     glDrawArrays(GL_LINES, 0, 2 * terrain->model->numVertices);
 }
 
-void DrawTerrain(Terrain* terrain, mat4 modelToWorld, mat4 worldToView)
+void DrawTerrain(Terrain* terrain, mat4 modelToWorld)
 {
     glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
-    glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "worldToView"), 1, GL_TRUE, worldToView.m);
     glUniform1ui(glGetUniformLocation(terrain->shader, "enableLight"), true);
     DrawModel(terrain->model, terrain->shader, "in_Position", "in_Normal", "in_TexCoord");
 }

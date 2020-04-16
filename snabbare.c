@@ -32,28 +32,40 @@
 #define TOP 0.5
 #define BOTTOM -0.5
 
-
+typedef enum {
+    CAM_BEHIND,
+    CAM_FRONT,
+    CAM_GOD,
+} CameraMode;
 
 typedef struct {
+    CameraMode mode;
     vec3 forward;
     vec3 up;
     vec3 pos;
+    vec3 lookat;
+    float distance;
+    float height;
+    float tilt;
 } Camera;
 
 Skybox* skybox;
 Terrain* terrain;
 
 // camera setup init
-vec3 forward = { 10,-5,10 };
-vec3 up = { 0,1,0 };
-vec3 cam = { 20, 20, 0 };
+Camera camera = {   CAM_BEHIND,
+                    { 10,-5,10 },
+                    { 0,1,0 },
+                    { 0, 0, 0 },
+                    {0, 0, 0},
+                    12,
+                    4,
+                    3,
+};
+
 int oldMouseX = 0, oldMouseY = 0;
 
 bool showNormals;
-
-vec3 bunnyPos = { 20, 0, 0 };
-vec3 bunnyUp = { 0, 1, 0 };
-
 
 GLuint grassTexture;
 
@@ -115,67 +127,81 @@ void OnTimer(int value)
 
 void mouseHandler(int x, int y)
 {
-    int dx = oldMouseX - x;
-    int dy = y - oldMouseY;
+    if (camera.mode == CAM_GOD)
+    {
+        int dx = oldMouseX - x;
+        int dy = y - oldMouseY;
 
-    vec3 left = Normalize(CrossProduct(up, forward));
-    float step = 0.002;
+        vec3 left = Normalize(CrossProduct(camera.up, camera.forward));
+        float step = 0.002;
 
-    // calculate camera rotation
-    mat4 camRotationUp = Ry(dx * step);
-    mat4 camRotationLeft = ArbRotate(left, dy * step);
-    mat4 camRotation = Mult(camRotationUp, camRotationLeft);
+        // calculate camera rotation
+        mat4 camRotationUp = Ry(dx * step);
+        mat4 camRotationLeft = ArbRotate(left, dy * step);
+        mat4 camRotation = Mult(camRotationUp, camRotationLeft);
 
-    // update forward and up vectors
-    forward = MultVec3(camRotation, forward);
-    up = MultVec3(camRotation, up);
+        // update forward and up vectors
+        camera.forward = MultVec3(camRotation, camera.forward);
+        camera.up = MultVec3(camRotation, camera.up);
 
-    // update (x,y) buffer
-    oldMouseX = 800 / 2;
-    oldMouseY = 600 / 2;
-    glutWarpPointer(800 / 2, 600 / 2);
+        // update (x,y) buffer
+        oldMouseX = 800 / 2;
+        oldMouseY = 600 / 2;
+        glutWarpPointer(800 / 2, 600 / 2);
+    }
 }
 
 void keyHandler(unsigned char key, int x, int y)
 {
-    float step = 1;
-    vec3 left = Normalize(CrossProduct(up, forward)); // basis (up, forward, left)
+    float step = 3;
+    vec3 left = Normalize(CrossProduct(camera.up, camera.forward)); // basis (up, forward, left)
     float turningSensibility = 0.1;
 
     switch (key) {
-    case 'z':
-        cam = VectorAdd(cam, ScalarMult(forward, step));
+    case 'i':
+        camera.pos = VectorAdd(camera.pos, ScalarMult(camera.forward, step));
         break;
-    case 's':
-        cam = VectorSub(cam, ScalarMult(forward, step));
+    case 'k':
+        camera.pos = VectorSub(camera.pos, ScalarMult(camera.forward, step));
         break;
-    case 'q':
-        cam = VectorAdd(cam, ScalarMult(left, step));
+    case 'j':
+        camera.pos = VectorAdd(camera.pos, ScalarMult(left, step));
         break;
-    case 'd':
-        cam = VectorSub(cam, ScalarMult(left, step));
+    case 'l':
+        camera.pos = VectorSub(camera.pos, ScalarMult(left, step));
         break;
-
-    case 'a':
-        cam.y -= step;
+    case 'u':
+        camera.pos.y -= step;
         break;
     case 32: // SPACEBAR
-        cam.y += step;
+        camera.pos.y += step;
+        break;
+
+    case 'c':
+        if (camera.mode == CAM_BEHIND)
+            camera.mode = CAM_GOD;
+        else
+        {
+            camera.mode = CAM_BEHIND;
+            camera.up.x = 0;
+            camera.up.y = 1;
+            camera.up.z = 0;
+        }
         break;
 
         // car control
-    case 'i':
+    case 'z':
         subaru->pos = VectorAdd(subaru->pos, subaru->speed);
         break;
-    case 'k':
+    case 's':
         subaru->pos = VectorSub(subaru->pos, subaru->speed);
         break;
-    case 'j':
+    case 'q':
         subaru->speed = MultVec3(Ry(turningSensibility), subaru->speed);
         subaru->front = MultVec3(Ry(turningSensibility), subaru->front);
         subaru->rotation = Mult(subaru->rotation, Ry(turningSensibility));
         break;
-    case 'l':
+    case 'd':
         subaru->speed = MultVec3(Ry(-turningSensibility), subaru->speed);
         subaru->front = MultVec3(Ry(-turningSensibility), subaru->front);
         subaru->rotation = Mult(subaru->rotation, Ry(-turningSensibility));
@@ -195,7 +221,7 @@ void init(void)
 {
 
     dumpInfo();
-    forward = Normalize(forward);
+    camera.forward = Normalize(camera.forward);
     showNormals = false;
 
     // GL inits
@@ -241,6 +267,18 @@ void init(void)
 
 GLfloat a, b = 0.0;
 
+void updateCamera(Camera* cam, Car* car) {
+
+    if (cam->mode == CAM_BEHIND)
+    {
+        cam->pos = VectorSub(car->pos, ScalarMult(Normalize(car->front), cam->distance));
+        cam->pos = VectorAdd(cam->pos, ScalarMult(Normalize(cam->up), cam->height));
+        cam->lookat = VectorAdd(car->pos, ScalarMult(Normalize(cam->up), cam->tilt));
+    }
+    else if (cam->mode == CAM_GOD)
+        cam->lookat = VectorAdd(cam->pos, cam->forward);
+}
+
 
 void display(void)
 {
@@ -260,15 +298,21 @@ void display(void)
     glUniform1f(glGetUniformLocation(program, "time"), a);
 
     mat4 modelToWorld = Mult(T(0, 0, 0), Ry(0));
-    mat4 worldToView = lookAtv(cam, VectorAdd(cam, forward), up);
+    mat4 worldToView;
 
+    updateCamera(&camera, subaru);
+    worldToView = lookAtv(camera.pos, camera.lookat, camera.up);
     // -------- Draw skybox
     DrawSkybox(skybox, worldToView);
+
+    glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "worldToView"), 1, GL_TRUE, worldToView.m);
+
+
     // -------- Draw terrain
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, grassTexture);
 
-    DrawTerrain(terrain, modelToWorld, worldToView);
+    DrawTerrain(terrain, modelToWorld);
 
     if (showNormals)
         DrawNormals(terrain);
