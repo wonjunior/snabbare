@@ -5,6 +5,8 @@
 #include "loadobj.h"
 #include "LoadTGA.h"
 
+#include "Terrain.h"
+
 
 typedef struct {
     Model* model;
@@ -19,3 +21,4 @@ typedef struct {
 Car* loadCar(GLuint shader, char* model, char* texture);
 void freeCar(Car* car);
 void drawCar(Car* car);
+void setCarHeight(Car* car, Terrain* terrain);

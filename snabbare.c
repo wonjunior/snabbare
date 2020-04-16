@@ -77,10 +77,10 @@ GLuint program;
 // Lightning 
 vec3 lightSourcesDirectionsPositions[] =
 {
-    {0.0f, 30.0f, 0.0f}, 		// positional
-    {0.0f, 0.0f, 0.0f}, 		// positional
-    {0.0f, 0.0f, 0.0f},	 	// along X (towards +X)
-    {0.0f, 0.0f, 0.0f}, 	// along Z (towards +Z)
+    {0.0f, 100.0f, 0.0f}, 		// positional
+    {256.0f, 100.0f, 0.0f}, 		// positional
+    {256.0f, 100.0f, 256.0f},	 	// along X (towards +X)
+    {0.0f, 100.0f, 256.0f}, 	// along Z (towards +Z)
 };
 
 vec3 lightSourcesColorsArr[] =
@@ -91,7 +91,7 @@ vec3 lightSourcesColorsArr[] =
     {1.0f, 1.0f, 1.0f}, 		// White light
 };
 
-GLint isDirectional[] = { 0,1,1,1 };
+GLint isDirectional[] = { 0,0,0,0 };
 GLfloat specularExponent[] = { 100.0, 200.0, 60.0, 50.0, 300.0, 150.0 }; // should be 1 per object
 
 
@@ -244,9 +244,11 @@ void init(void)
 
 GLfloat a, b = 0.0;
 
+
 void display(void)
 {
 
+    setCarHeight(subaru, terrain);
     // clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
