@@ -82,3 +82,51 @@ void setCarHeight(Car* car, Terrain* terrain)
 
     car->pos.y = weightA * a.y + weightB * b.y + weightC * c.y;
 }
+
+void setCarUp(Car* car, Terrain* terrain)
+{
+    //set car position
+    int xleft = floor(car->pos.x);
+    int xright = xleft + 1;
+    int zleft = floor(car->pos.z);
+    int zright = zleft + 1;
+
+    vec3 a, b, c;
+    if (car->pos.x - xleft + car->pos.z - zleft < 1) // can be either triangle 1 or triangle 2
+    {
+        a = SetVector(xleft, 0, zleft);
+        b = SetVector(xright, 0, zleft);
+        c = SetVector(xleft, 0, zright);
+    }
+    else
+    {
+        a = SetVector(xright, 0, zright);
+        b = SetVector(xleft, 0, zright);
+        c = SetVector(xright, 0, zleft);
+    }
+
+    int terrainWidth = sqrt(terrain->model->numVertices);
+    vec3 normalA, normalB, normalC;
+
+    normalA.x = terrain->model->vertexArray[(int)(a.x + a.z * terrainWidth) * 3 + 0];
+    normalA.y = terrain->model->vertexArray[(int)(a.x + a.z * terrainWidth) * 3 + 1];
+    normalA.z = terrain->model->vertexArray[(int)(a.x + a.z * terrainWidth) * 3 + 2];
+
+    normalB.x = terrain->model->vertexArray[(int)(b.x + b.z * terrainWidth) * 3 + 0];
+    normalB.y = terrain->model->vertexArray[(int)(b.x + b.z * terrainWidth) * 3 + 1];
+    normalB.z = terrain->model->vertexArray[(int)(b.x + b.z * terrainWidth) * 3 + 2];
+
+    normalC.x = terrain->model->vertexArray[(int)(c.x + c.z * terrainWidth) * 3 + 0];
+    normalC.y = terrain->model->vertexArray[(int)(c.x + c.z * terrainWidth) * 3 + 1];
+    normalC.z = terrain->model->vertexArray[(int)(c.x + c.z * terrainWidth) * 3 + 2];
+
+
+    float weightB = (car->pos.x - a.x) * (car->pos.x > a.x ? +1 : -1);
+    float weightC = (car->pos.z - a.z) * (car->pos.z > a.z ? +1 : -1);
+    float weightA = 1 - weightB - weightC;
+    printf("%f\n", car->pos.x - a.x);
+
+   /* vec3 newUp = Normalize(VectorAdd(ScalarMult(normalA, weightA), VectorAdd(ScalarMult(normalB, weightB), ScalarMult(normalC, weightC))));
+    car->rotation = Mult(car->rotation, RotateTowards(Normalize(car->up), newUp));
+    car->up = newUp;*/
+}

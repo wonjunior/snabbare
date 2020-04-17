@@ -18,6 +18,7 @@
 #include "Terrain.h"
 #include "Car.h"
 #include "Skybox.h"
+#include "Camera.h"
 
 // Globals
 #define PI 3.1415
@@ -32,41 +33,16 @@
 #define TOP 0.5
 #define BOTTOM -0.5
 
-typedef enum {
-    CAM_BEHIND,
-    CAM_FRONT,
-    CAM_GOD,
-} CameraMode;
 
-typedef struct {
-    CameraMode mode;
-    vec3 forward;
-    vec3 up;
-    vec3 pos;
-    vec3 lookat;
-    float distance;
-    float height;
-    float tilt;
-} Camera;
 
-enum {CTRL_GAS, CTRL_BRAKE, CTRL_LEFT, CTRL_RIGHT};
+
 char controls[4] = { 0, 0, 0, 0 };
 
 Skybox* skybox;
 Terrain* terrain;
 
-// camera setup init
-Camera camera = {   CAM_BEHIND,
-                    { 10,-5,10 },
-                    { 0,1,0 },
-                    { 0, 0, 0 },
-                    {0, 0, 0},
-                    12,
-                    4,
-                    3,
-};
+Camera camera;
 
-int oldMouseX = 0, oldMouseY = 0;
 
 bool showNormals;
 
@@ -144,33 +120,11 @@ void updateCar()
         subaru->rotation = Mult(subaru->rotation, Ry(-turningSensibility));
     }
 
-
 }
 
 void mouseHandler(int x, int y)
 {
-    if (camera.mode == CAM_GOD)
-    {
-        int dx = oldMouseX - x;
-        int dy = y - oldMouseY;
-
-        vec3 left = Normalize(CrossProduct(camera.up, camera.forward));
-        float step = 0.002;
-
-        // calculate camera rotation
-        mat4 camRotationUp = Ry(dx * step);
-        mat4 camRotationLeft = ArbRotate(left, dy * step);
-        mat4 camRotation = Mult(camRotationUp, camRotationLeft);
-
-        // update forward and up vectors
-        camera.forward = MultVec3(camRotation, camera.forward);
-        camera.up = MultVec3(camRotation, camera.up);
-
-        // update (x,y) buffer
-        oldMouseX = 800 / 2;
-        oldMouseY = 600 / 2;
-        glutWarpPointer(800 / 2, 600 / 2);
-    }
+    rotateGodCamera(&camera, x, y);
 }
 
 void keyUpHandler(unsigned char key, int x, int y) {
@@ -194,40 +148,9 @@ void keyUpHandler(unsigned char key, int x, int y) {
 
 void keyHandler(unsigned char key, int x, int y)
 {
-    float step = 3;
-    vec3 left = Normalize(CrossProduct(camera.up, camera.forward)); // basis (up, forward, left)
+    moveGodCamera(&camera, key);
 
     switch (key) {
-    case 'i':
-        camera.pos = VectorAdd(camera.pos, ScalarMult(camera.forward, step));
-        break;
-    case 'k':
-        camera.pos = VectorSub(camera.pos, ScalarMult(camera.forward, step));
-        break;
-    case 'j':
-        camera.pos = VectorAdd(camera.pos, ScalarMult(left, step));
-        break;
-    case 'l':
-        camera.pos = VectorSub(camera.pos, ScalarMult(left, step));
-        break;
-    case 'u':
-        camera.pos.y -= step;
-        break;
-    case 32: // SPACEBAR
-        camera.pos.y += step;
-        break;
-
-    case 'c':
-        if (camera.mode == CAM_BEHIND)
-            camera.mode = CAM_GOD;
-        else
-        {
-            camera.mode = CAM_BEHIND;
-            camera.up.x = 0;
-            camera.up.y = 1;
-            camera.up.z = 0;
-        }
-        break;
 
         // car control
     case 'z':
@@ -243,13 +166,11 @@ void keyHandler(unsigned char key, int x, int y)
         controls[CTRL_RIGHT] = 1;
         break;
 
-
         // terrain nromals
     case 'n':
         showNormals = !showNormals;
         break;
     }
-
 }
 
 
@@ -257,7 +178,7 @@ void init(void)
 {
 
     dumpInfo();
-    camera.forward = Normalize(camera.forward);
+    camera = createCamera();
     showNormals = false;
 
     // GL inits
@@ -283,7 +204,7 @@ void init(void)
  
 
     // ------------------- Load models
-    subaru = loadCar(program, "models/fiat.obj", "textures/orange.tga");
+    subaru = loadCar(program, "models/subaru.obj", "textures/orange.tga");
 
 
 
@@ -303,23 +224,12 @@ void init(void)
 
 GLfloat a, b = 0.0;
 
-void updateCamera(Camera* cam, Car* car) {
-
-    if (cam->mode == CAM_BEHIND)
-    {
-        cam->pos = VectorSub(car->pos, ScalarMult(Normalize(car->front), cam->distance));
-        cam->pos = VectorAdd(cam->pos, ScalarMult(Normalize(cam->up), cam->height));
-        cam->lookat = VectorAdd(car->pos, ScalarMult(Normalize(cam->up), cam->tilt));
-    }
-    else if (cam->mode == CAM_GOD)
-        cam->lookat = VectorAdd(cam->pos, cam->forward);
-}
-
 
 void display(void)
 {
 
     setCarHeight(subaru, terrain);
+    setCarUp(subaru, terrain);
     // clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -362,52 +272,6 @@ void display(void)
     glutSwapBuffers();
 }
 
-int prevx = 0, prevy = 0;
-
-void mouseUpDown(int button, int state, int x, int y)
-{
-    if (state == GLUT_DOWN)
-    {
-        prevx = x;
-        prevy = y;
-    }
-}
-
-void mouseDragged(int x, int y)
-{
-    vec3 p;
-    mat4 m;
-    mat3 wv3;
-
-    // This is a simple and IMHO really nice trackball system:
-    // You must have two things, the worldToViewMatrix and the modelToWorldMatrix
-    // (and the latter is modified).
-
-    // Use the movement direction to create an orthogonal rotation axis
-    p.y = x - prevx;
-    p.x = -(prevy - y);
-    p.z = 0;
-
-    // Transform the view coordinate rotation axis to world coordinates!
-    wv3 = mat4tomat3(worldToViewMatrix);
-    p = MultMat3Vec3(InvertMat3(wv3), p);
-
-    // Create a rotation around this axis and premultiply it on the model-to-world matrix
-    m = ArbRotate(p, sqrt(p.x * p.x + p.y * p.y) / 50.0);
-    modelToWorldMatrix = Mult(m, modelToWorldMatrix);
-
-    prevx = x;
-    prevy = y;
-
-    glutPostRedisplay();
-}
-
-void mouse(int x, int y)
-{
-    b = x * 1.0;
-    a = y * 1.0;
-    glutPostRedisplay();
-}
 
 int main(int argc, char* argv[])
 {
