@@ -174,9 +174,19 @@ void keyHandler(unsigned char key, int x, int y)
 }
 
 
+void loadShaderParams(GLuint shader) 
+{
+    // Projection
+    glUniformMatrix4fv(glGetUniformLocation(shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix);
+    // Lighting
+    glUniform3fv(glGetUniformLocation(shader, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
+    glUniform3fv(glGetUniformLocation(shader, "lightSourcesColorArr"), 4, &lightSourcesColorsArr[0].x);
+    glUniform1f(glGetUniformLocation(shader, "specularExponent"), specularExponent[0]);
+    glUniform1iv(glGetUniformLocation(shader, "isDirectional"), 4, isDirectional);
+}
+
 void init(void)
 {
-
     dumpInfo();
     camera = createCamera();
     showNormals = false;
@@ -192,10 +202,10 @@ void init(void)
 
     // Load and compile shader
     program = loadShaders("lab4-6.vert", "lab4-6.frag");
-    glUseProgram(program);
+    glUseProgram(program); // default shader
 
     // ------------------- textures loading
-    LoadTGATextureSimple("textures/maskros512.tga", &grassTexture);
+    LoadTGATextureSimple("textures/concrete.tga", &grassTexture);
     glUniform1i(glGetUniformLocation(program, "texUnit"), 0); 		// Texture unit 0
     glActiveTexture(GL_TEXTURE0);
 
@@ -204,22 +214,13 @@ void init(void)
  
 
     // ------------------- Load models
-    subaru = loadCar(program, "models/subaru.obj", "textures/orange.tga");
+    subaru = loadCar(program, "models/fiat.obj", "textures/orange.tga");
 
+    loadShaderParams(program);
 
-
-    //ProjectionMatrix = frustum(-0.5, 0.5, -0.5, 0.5, 1.0, 30.0);
-    // ------------------- Global variable
-    // Projection
-    glUniformMatrix4fv(glGetUniformLocation(program, "projectionMatrix"), 1, GL_TRUE, projectionMatrix);
-    // Lighting
-    glUniform3fv(glGetUniformLocation(program, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
-    glUniform3fv(glGetUniformLocation(program, "lightSourcesColorArr"), 4, &lightSourcesColorsArr[0].x);
-    glUniform1f(glGetUniformLocation(program, "specularExponent"), specularExponent[0]);
-    glUniform1iv(glGetUniformLocation(program, "isDirectional"), 4, isDirectional);
-
-    
-    terrain = GenerateTerrain(program, "textures/fft-terrain.tga");
+    GLuint terrainShader = loadShaders("shaders/terrain.vert", "shaders/terrain.frag");
+    terrain = GenerateTerrain(terrainShader, "textures/fft-terrain.tga", "textures/terrain_multitex.tga");
+    loadShaderParams(terrain->shader);
 }
 
 GLfloat a, b = 0.0;
@@ -248,22 +249,24 @@ void display(void)
 
     updateCamera(&camera, subaru);
     worldToView = lookAtv(camera.pos, camera.lookat, camera.up);
+    
     // -------- Draw skybox
     DrawSkybox(skybox, worldToView);
 
-    glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "worldToView"), 1, GL_TRUE, worldToView.m);
 
 
     // -------- Draw terrain
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, grassTexture);
+    //glActiveTexture(GL_TEXTURE0);
+    //glBindTexture(GL_TEXTURE_2D, grassTexture);
 
+    glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "worldToView"), 1, GL_TRUE, worldToView.m);
     DrawTerrain(terrain, modelToWorld);
 
     if (showNormals)
         DrawNormals(terrain);
 
-
+    glUniformMatrix4fv(glGetUniformLocation(program, "worldToView"), 1, GL_TRUE, worldToView.m);
+    glUseProgram(program); // temporary default shader
     updateCar();
 
     drawCar(subaru);
