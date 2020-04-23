@@ -16,8 +16,10 @@ void DrawSkybox(Skybox* skybox, mat4 worldToView)
 {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, skybox->texture);
     glUniform1ui(glGetUniformLocation(skybox->shader, "enableLight"), false);
+
 
     mat4 modelToWorldSkyBox = Mult(T(0, -10, 0), S(SKYBOX_SIZE, SKYBOX_SIZE, SKYBOX_SIZE));
     mat4 worldToViewSkyBox = worldToView;
@@ -32,4 +34,7 @@ void DrawSkybox(Skybox* skybox, mat4 worldToView)
     glUniform1ui(glGetUniformLocation(skybox->shader, "enableLight"), true);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+
+    // reset back to default worldToView
+    LoadMatrixToUniform("worldToView", worldToView);
 }

@@ -37,7 +37,7 @@ Car* loadCar(GLuint shader, char* modelFile, char textureFile[])
 void drawCar(Car* car) {
 
     //texture
-    //glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, car->texture);
     //glUniform1i(glGetUniformLocation(car->shader, "texUnit"), 0);
 

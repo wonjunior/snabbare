@@ -2,7 +2,7 @@
 #include "Terrain.h"
 
 
-Terrain* GenerateTerrain(GLuint shader, char* textureFileName)
+Terrain* GenerateTerrain(GLuint shader, char* textureFileName, char* terrainTextureMapFileName)
 {
 
     TextureData tex;
@@ -20,8 +20,6 @@ Terrain* GenerateTerrain(GLuint shader, char* textureFileName)
 
     printf("bpp %d\n", tex.bpp);
     printf("width ; height => %d %d\n", tex.width, tex.height);
-
-
 
     for (x = 0; x < tex.width; x++)
     {
@@ -84,8 +82,8 @@ Terrain* GenerateTerrain(GLuint shader, char* textureFileName)
             normalArrowVertices[(x + z * tex.width) * 6 + 5] = vertexArray[(x + z * tex.width) * 3 + 2] + 2 * temp.z;
 
             // Texture coordinates. You may want to scale them.
-            texCoordArray[(x + z * tex.width) * 2 + 0] = x; // (float)x / tex.width;
-            texCoordArray[(x + z * tex.width) * 2 + 1] = z; // (float)z / tex.height;
+            texCoordArray[(x + z * tex.width) * 2 + 0] = (float)x / tex.width;
+            texCoordArray[(x + z * tex.width) * 2 + 1] = (float)z / tex.height;
         }
     }
 
@@ -115,6 +113,12 @@ Terrain* GenerateTerrain(GLuint shader, char* textureFileName)
     glEnableVertexAttribArray(glGetAttribLocation(shader, "in_Position"));
 
 
+    // load terrain textures
+    LoadTGATextureSimple(terrainTextureMapFileName, &terrain->terrainTextureMap);
+    LoadTGATextureSimple("textures/concrete.tga", &terrain->textures[0]);
+    LoadTGATextureSimple("textures/sand.tga", &terrain->textures[1]);
+    LoadTGATextureSimple("textures/grass.tga", &terrain->textures[2]);
+    LoadTGATextureSimple("textures/snow.tga", &terrain->textures[3]);
     return terrain;
 }
 
@@ -126,6 +130,25 @@ void DrawNormals(Terrain* terrain)
 
 void DrawTerrain(Terrain* terrain, mat4 modelToWorld)
 {
+    glUseProgram(terrain->shader);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, terrain->terrainTextureMap);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, terrain->textures[0]);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, terrain->textures[1]);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, terrain->textures[2]);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, terrain->textures[3]);
+
+    glUniform1i(glGetUniformLocation(terrain->shader, "textureMapUnit"), 0);
+    glUniform1i(glGetUniformLocation(terrain->shader, "concreteTexUnit"), 1);
+    glUniform1i(glGetUniformLocation(terrain->shader, "sandTexUnit"), 2);
+    glUniform1i(glGetUniformLocation(terrain->shader, "grassTexUnit"), 3);
+    glUniform1i(glGetUniformLocation(terrain->shader, "snowTexUnit"), 4);
+
     glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
     glUniform1ui(glGetUniformLocation(terrain->shader, "enableLight"), true);
     DrawModel(terrain->model, terrain->shader, "in_Position", "in_Normal", "in_TexCoord");

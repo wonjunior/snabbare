@@ -11,8 +11,9 @@ typedef struct {
     Model* model;
     unsigned int arrayNormalArrow;
     unsigned int bufferNormalArrow;
-    TextureData terrainTextureMap;
+    GLuint terrainTextureMap;
     GLuint shader;
+    GLuint textures[4];
 } Terrain;
 
 Terrain* GenerateTerrain(GLuint shader, char* textureFileName);
