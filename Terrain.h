@@ -14,6 +14,8 @@ typedef struct {
     GLuint terrainTextureMap;
     GLuint shader;
     GLuint textures[4];
+    int w;
+    int h;
 } Terrain;
 
 Terrain* GenerateTerrain(GLuint shader, char* textureFileName);

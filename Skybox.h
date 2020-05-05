@@ -18,3 +18,4 @@ typedef struct {
 
 Skybox* CreateSkybox(const char* modelFileName, char* textureFileName, GLuint shader);
 void DrawSkybox(Skybox* skybox, mat4 worldToView);
+void LoadMatrixToUniform(const char* variableName, mat4 matrix);

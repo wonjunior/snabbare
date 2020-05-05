@@ -89,6 +89,7 @@
     <ClCompile Include="Car.c" />
     <ClCompile Include="Skybox.c" />
     <ClCompile Include="snabbare.c" />
+    <ClCompile Include="Forest.c" />
     <ClCompile Include="Sphere.c" />
     <ClCompile Include="Terrain.c" />
   </ItemGroup>
@@ -99,6 +100,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Car.h" />
+    <ClInclude Include="Forest.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Terrain.h" />

@@ -21,13 +21,15 @@ Terrain* GenerateTerrain(GLuint shader, char* textureFileName, char* terrainText
     printf("bpp %d\n", tex.bpp);
     printf("width ; height => %d %d\n", tex.width, tex.height);
 
+    
+
     for (x = 0; x < tex.width; x++)
     {
         for (z = 0; z < tex.height; z++)
         {
             // Vertex array. You need to scale this properly
             vertexArray[(x + z * tex.width) * 3 + 0] = x / 1.0;
-            vertexArray[(x + z * tex.width) * 3 + 1] = tex.imageData[(x + z * tex.width) * (tex.bpp / 8)] / (5.0 * 2.0);
+            vertexArray[(x + z * tex.width) * 3 + 1] = 0.0;//tex.imageData[(x + z * tex.width) * (tex.bpp / 8)] / (5.0 * 2.0);
             vertexArray[(x + z * tex.width) * 3 + 2] = z / 1.0;
         }
     }
@@ -88,6 +90,9 @@ Terrain* GenerateTerrain(GLuint shader, char* textureFileName, char* terrainText
     }
 
     Terrain* terrain = malloc(sizeof(Terrain));
+
+    terrain->w = tex.width;
+    terrain->h = tex.height;
 
     terrain->shader = shader;
 

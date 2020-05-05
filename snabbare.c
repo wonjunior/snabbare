@@ -19,6 +19,7 @@
 #include "Car.h"
 #include "Skybox.h"
 #include "Camera.h"
+#include "Forest.h"
 
 // Globals
 #define PI 3.1415
@@ -40,6 +41,7 @@ char controls[4] = { 0, 0, 0, 0 };
 
 Skybox* skybox;
 Terrain* terrain;
+Forest* forest;
 
 Camera camera;
 
@@ -177,6 +179,7 @@ void keyHandler(unsigned char key, int x, int y)
 void loadShaderParams(GLuint shader) 
 {
     // Projection
+
     glUniformMatrix4fv(glGetUniformLocation(shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix);
     // Lighting
     glUniform3fv(glGetUniformLocation(shader, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
@@ -200,6 +203,8 @@ void init(void)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
+    
+
     // Load and compile shader
     program = loadShaders("lab4-6.vert", "lab4-6.frag");
     glUseProgram(program); // default shader
@@ -221,6 +226,9 @@ void init(void)
     GLuint terrainShader = loadShaders("shaders/terrain.vert", "shaders/terrain.frag");
     terrain = GenerateTerrain(terrainShader, "textures/fft-terrain.tga", "textures/terrain_multitex.tga");
     loadShaderParams(terrain->shader);
+
+    forest = loadForest(terrain->w, "textures/forest.tga");
+    glUseProgram(program);
 }
 
 GLfloat a, b = 0.0;
@@ -228,7 +236,6 @@ GLfloat a, b = 0.0;
 
 void display(void)
 {
-
     setCarHeight(subaru, terrain);
     setCarUp(subaru, terrain);
     // clear the screen
@@ -248,10 +255,14 @@ void display(void)
     mat4 worldToView;
 
     updateCamera(&camera, subaru);
+
     worldToView = lookAtv(camera.pos, camera.lookat, camera.up);
+
+    drawForest(forest, worldToView);
+    glUseProgram(program);
     
     // -------- Draw skybox
-    DrawSkybox(skybox, worldToView);
+    //DrawSkybox(skybox, worldToView);
 
 
 
