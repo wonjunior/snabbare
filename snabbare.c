@@ -189,6 +189,12 @@ void loadShaderParams(GLuint shader)
     glUniform1ui(glGetUniformLocation(shader, "enableLight"), true);
 }
 
+void initBillboardShader(GLuint shader)
+{
+    glUniformMatrix4fv(glGetUniformLocation(shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix);
+    glUniform1i(glGetUniformLocation(shader, "texUnit"), 0);
+}
+
 void init(void)
 {
     dumpInfo();
@@ -228,7 +234,13 @@ void init(void)
     terrain = GenerateTerrain(terrainShader, "textures/fft-terrain.tga", "textures/terrain_multitex.tga");
     loadShaderParams(terrain->shader);
 
-    forest = loadForest(terrain->w, "textures/forest_3.tga");
+
+    GLuint billboardShader = loadShaders("shaders/forest.vert", "shaders/forest.frag");
+    forest = loadForest(terrain->w, "textures/forest_3.tga", billboardShader);
+    initBillboardShader(billboardShader);
+
+    
+
     glUseProgram(program);
 }
 

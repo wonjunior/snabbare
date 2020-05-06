@@ -1,17 +1,14 @@
 
 #include "Forest.h"
 
-Forest* loadForest(float xmax, char* fileTexture) {
+Forest* loadForest(float xmax, char* fileTexture, GLuint shader) {
 
     Forest* forest = malloc(sizeof(Forest));
     if (forest == NULL)
         printf("failed to allocate forest struct");
 
-
-    glUseProgram(forest->shader);
-    
-
-    forest->shader = loadShaders("shaders/forest.vert", "shaders/forest.frag");
+    forest->shader = shader;
+  
 
     LoadTGATextureSimple(fileTexture, &forest->texture);
 //    float texture_size = 100
@@ -64,20 +61,7 @@ Forest* loadForest(float xmax, char* fileTexture) {
     };
 
     forest->model = LoadDataToModel(vertices, NULL, texCoords, NULL, indices, 10, 3*8);
-
-    const GLfloat projectionMatrix[] =
-    {
-        2.0f * NEAR / (RIGHT - LEFT), 0.0f, (RIGHT + LEFT) / (RIGHT - LEFT), 0.0f,
-        0.0f, 2.0f * NEAR / (TOP - BOTTOM), (TOP + BOTTOM) / (TOP - BOTTOM), 0.0f,
-        0.0f, 0.0f, -(FAR + NEAR) / (FAR - NEAR), -2 * FAR * NEAR / (FAR - NEAR),
-        0.0f, 0.0f, -1.0f, 0.0f
-    };
-
-    
-    glUniformMatrix4fv(glGetUniformLocation(forest->shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix);
-    glUniform1i(glGetUniformLocation(forest->shader, "texUnit"), 0);
    
-
     return forest;
 }
 

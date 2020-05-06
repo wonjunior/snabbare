@@ -92,6 +92,7 @@
     <ClCompile Include="Forest.c" />
     <ClCompile Include="Sphere.c" />
     <ClCompile Include="Terrain.c" />
+    <ClCompile Include="Tree.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="lab4-6.frag" />
@@ -104,6 +105,7 @@
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="Tree.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
