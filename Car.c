@@ -31,6 +31,7 @@ Car* loadCar(GLuint shader, char* modelFile, char textureFile[])
     car->up.z = 0;
     car->rotation = IdentityMatrix();
     car->speed = 0.05;
+    car->gas = 0.0;
     return car;
 }
 
@@ -129,4 +130,54 @@ void setCarUp(Car* car, Terrain* terrain)
    /* vec3 newUp = Normalize(VectorAdd(ScalarMult(normalA, weightA), VectorAdd(ScalarMult(normalB, weightB), ScalarMult(normalC, weightC))));
     car->rotation = Mult(car->rotation, RotateTowards(Normalize(car->up), newUp));
     car->up = newUp;*/
+}
+
+void updateCar(Car* subaru, const char* controls)
+{
+    
+    float turningSensibility = 0.01;
+    float naturalSpeedDecrease = 0.0002;
+    float v_max = 0.2;
+
+    if (controls[CTRL_GAS]) {
+        if (subaru->speed < v_max)
+            subaru->speed += 0.0005;
+        else
+            subaru->speed = v_max;
+        /**
+        if (subaru->gas < 1) {
+            subaru->gas += 0.001;
+            float t = subaru->gas;
+            float a_max = 0.0005;
+            //float a = -4 * a_max * t * (t - 1);
+            subaru->speed += a;
+        }*/
+    }
+    else {
+        subaru->gas = 0;
+        if (subaru->speed > 0) {
+            subaru->speed -= naturalSpeedDecrease;
+        }
+        else
+            subaru->speed = 0;
+    }
+   
+    if (controls[CTRL_BRAKE]) {
+        if (subaru->speed >= 0.005)
+        subaru->speed -= 0.005;
+    }
+    if (controls[CTRL_LEFT]) {
+        subaru->direction = MultVec3(Ry(turningSensibility), subaru->direction);
+        subaru->front = MultVec3(Ry(turningSensibility), subaru->front);
+        subaru->rotation = Mult(subaru->rotation, Ry(turningSensibility));
+    }
+    if (controls[CTRL_RIGHT]) {
+        subaru->direction = MultVec3(Ry(-turningSensibility), subaru->direction);
+        subaru->front = MultVec3(Ry(-turningSensibility), subaru->front);
+        subaru->rotation = Mult(subaru->rotation, Ry(-turningSensibility));
+    }
+
+    
+    subaru->pos = VectorAdd(subaru->pos, ScalarMult(Normalize(subaru->direction), subaru->speed));
+
 }

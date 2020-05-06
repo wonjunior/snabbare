@@ -20,6 +20,7 @@
 #include "Skybox.h"
 #include "Camera.h"
 #include "Forest.h"
+#include "Tree.h"
 
 // Globals
 #define PI 3.1415
@@ -42,6 +43,7 @@ char controls[4] = { 0, 0, 0, 0 };
 Skybox* skybox;
 Terrain* terrain;
 Forest* forest;
+Tree* tree;
 
 Camera camera;
 
@@ -100,29 +102,7 @@ void LoadMatrixToUniform(const char* variableName, mat4 matrix)
     glUniformMatrix4fv(glGetUniformLocation(program, variableName), 1, GL_TRUE, matrix.m);
 }
 
-void updateCar()
-{
-    subaru->pos = VectorAdd(subaru->pos, ScalarMult(Normalize(subaru->direction), subaru->speed));
-    float turningSensibility = 0.01;
 
-    if (controls[CTRL_GAS]) {
-        subaru->speed += 0.001;
-    }
-    if (controls[CTRL_BRAKE]) {
-        subaru->speed -= 0.001;
-    }
-    if (controls[CTRL_LEFT]) {
-        subaru->direction = MultVec3(Ry(turningSensibility), subaru->direction);
-        subaru->front = MultVec3(Ry(turningSensibility), subaru->front);
-        subaru->rotation = Mult(subaru->rotation, Ry(turningSensibility));
-    }
-    if (controls[CTRL_RIGHT]) {
-        subaru->direction = MultVec3(Ry(-turningSensibility), subaru->direction);
-        subaru->front = MultVec3(Ry(-turningSensibility), subaru->front);
-        subaru->rotation = Mult(subaru->rotation, Ry(-turningSensibility));
-    }
-
-}
 
 void mouseHandler(int x, int y)
 {
@@ -231,14 +211,14 @@ void init(void)
     loadShaderParams(program);
 
     GLuint terrainShader = loadShaders("shaders/terrain.vert", "shaders/terrain.frag");
-    terrain = GenerateTerrain(terrainShader, "textures/fft-terrain.tga", "textures/terrain_multitex.tga");
+    terrain = GenerateTerrain(terrainShader, "textures/hugo1.tga", "textures/terrain_multitex.tga");
     loadShaderParams(terrain->shader);
 
 
     GLuint billboardShader = loadShaders("shaders/forest.vert", "shaders/forest.frag");
     forest = loadForest(terrain->w, "textures/forest_3.tga", billboardShader);
     initBillboardShader(billboardShader);
-
+    tree = loadTrees("textures/tree2.tga", "textures/tree_map.tga", terrain, billboardShader);
     
 
     glUseProgram(program);
@@ -271,12 +251,9 @@ void display(void)
 
     worldToView = lookAtv(camera.pos, camera.lookat, camera.up);
 
-    drawForest(forest, worldToView);
-    glUseProgram(program);
-    
     // -------- Draw skybox
-    //DrawSkybox(skybox, worldToView);
-
+    DrawSkybox(skybox, worldToView);
+    
 
 
     // -------- Draw terrain
@@ -291,9 +268,13 @@ void display(void)
 
     glUniformMatrix4fv(glGetUniformLocation(program, "worldToView"), 1, GL_TRUE, worldToView.m);
     glUseProgram(program); // temporary default shader
-    updateCar();
+    updateCar(subaru, controls);
 
     drawCar(subaru);
+
+    drawForest(forest, worldToView);
+    drawTrees(tree, worldToView);
+    glUseProgram(program);
 
 
     glutSwapBuffers();

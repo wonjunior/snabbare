@@ -25,7 +25,6 @@ typedef struct {
     float tilt;
 } Camera;
 
-enum { CTRL_GAS, CTRL_BRAKE, CTRL_LEFT, CTRL_RIGHT };
 
 
 Camera createCamera();
