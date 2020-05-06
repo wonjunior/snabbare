@@ -53,7 +53,7 @@ void main(void)
 	vec4 texColor = texture(texUnit, vert_textCoord);
 
     if (enableLight)
-        out_Color = vec4(shade, (enableTransparency ? 0.5 : 1.0)) * texColor * (nightMode ? 0.15 : 1) + 0.1;
+        out_Color = vec4(shade, (enableTransparency ? 0.5 : 1.0)) * texColor * (nightMode ? 0.15 : 1);
     else
         out_Color = texColor * (nightMode ? 0.15 : 1);
 }

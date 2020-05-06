@@ -5,11 +5,10 @@ Forest* loadForest(float xmax, char* fileTexture) {
 
     Forest* forest = malloc(sizeof(Forest));
     if (forest == NULL)
-        printf("forest mal alloue");
+        printf("failed to allocate forest struct");
 
 
     glUseProgram(forest->shader);
-
     
 
     forest->shader = loadShaders("shaders/forest.vert", "shaders/forest.frag");
@@ -23,21 +22,48 @@ Forest* loadForest(float xmax, char* fileTexture) {
     {   0.0, 0.0, 0.0,
         0.0, h, 0.0,
         xmax, 0.0, 0.0,
-        xmax, h, 0.0 };
+        xmax, h, 0.0,
+        xmax, 0.0, xmax,
+        xmax, h, xmax,
+        0.0, 0.0, xmax,
+        0.0, h, xmax,
+
+        0.0, 0.0, 0.0,
+        0.0, h, 0.0
+    };
 
     GLuint indices[] = {
         3, 0, 2,
         1, 0, 3,
+
+        2, 4, 3,
+        3, 4, 5,
+
+        4, 6, 5,
+        6, 7, 4,
+
+        6, 8, 9,
+        9, 7, 6
     };
 
     GLfloat texCoords[] = {
         0.0, 1.0,
         0.0, 0.0,
+
         repetitions, 1.0,
-        repetitions, 0.0
+        repetitions, 0.0,
+
+        2 * repetitions, 1.0,
+        2 * repetitions, 0.0,
+
+        3 * repetitions, 1.0,
+        3 * repetitions, 0.0,
+
+        4 * repetitions, 1.0,
+        4 * repetitions, 0.0,
     };
 
-    forest->model = LoadDataToModel(vertices, NULL, texCoords, NULL, indices, 4, 6);
+    forest->model = LoadDataToModel(vertices, NULL, texCoords, NULL, indices, 10, 3*8);
 
     const GLfloat projectionMatrix[] =
     {
@@ -56,8 +82,8 @@ Forest* loadForest(float xmax, char* fileTexture) {
 }
 
 void drawForest(Forest* forest, mat4 worldToView) {
-    mat4 m2w = IdentityMatrix();
-    mat4 modelToView = Mult(m2w, worldToView);
+    mat4 modelToWorld = IdentityMatrix();
+    mat4 modelToView = Mult(modelToWorld, worldToView);
     glUseProgram(forest->shader);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, forest->texture);

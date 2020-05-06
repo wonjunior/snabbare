@@ -155,6 +155,5 @@ void DrawTerrain(Terrain* terrain, mat4 modelToWorld)
     glUniform1i(glGetUniformLocation(terrain->shader, "snowTexUnit"), 4);
 
     glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
-    glUniform1ui(glGetUniformLocation(terrain->shader, "enableLight"), true);
     DrawModel(terrain->model, terrain->shader, "in_Position", "in_Normal", "in_TexCoord");
 }

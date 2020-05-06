@@ -186,6 +186,7 @@ void loadShaderParams(GLuint shader)
     glUniform3fv(glGetUniformLocation(shader, "lightSourcesColorArr"), 4, &lightSourcesColorsArr[0].x);
     glUniform1f(glGetUniformLocation(shader, "specularExponent"), specularExponent[0]);
     glUniform1iv(glGetUniformLocation(shader, "isDirectional"), 4, isDirectional);
+    glUniform1ui(glGetUniformLocation(shader, "enableLight"), true);
 }
 
 void init(void)
