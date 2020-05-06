@@ -15,8 +15,8 @@ Forest* loadForest(float xmax, char* fileTexture) {
 
     LoadTGATextureSimple(fileTexture, &forest->texture);
 //    float texture_size = 100
-    float repetitions = 13;
-    float h = 40;
+    float repetitions = 2;
+    float h = 150;
 
     GLfloat vertices[] =
     {   0.0, 0.0, 0.0,

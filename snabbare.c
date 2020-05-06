@@ -228,7 +228,7 @@ void init(void)
     terrain = GenerateTerrain(terrainShader, "textures/fft-terrain.tga", "textures/terrain_multitex.tga");
     loadShaderParams(terrain->shader);
 
-    forest = loadForest(terrain->w, "textures/forest.tga");
+    forest = loadForest(terrain->w, "textures/forest_3.tga");
     glUseProgram(program);
 }
 
