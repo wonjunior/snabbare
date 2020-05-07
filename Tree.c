@@ -1,5 +1,6 @@
 #include "Tree.h"
 
+
 Tree* loadTrees(char* fileTexture, const char* mapFile, Terrain* terrain, GLuint shader) {
 
     Tree* tree = malloc(sizeof(Tree));
@@ -41,17 +42,31 @@ Tree* loadTrees(char* fileTexture, const char* mapFile, Terrain* terrain, GLuint
     return tree;
 }
 
-void drawTrees(Tree* tree, mat4 worldToView) {
+void drawTrees(Tree* tree, mat4 worldToView, const Camera camera) {
 
-    mat4 modelToWorld = IdentityMatrix();
-    mat4 modelToView = Mult(modelToWorld, worldToView);
+    mat4 modelToWorld, rot, modelToView;
+    vec3 old_normal = { 0, 0, 1 }, new_normal, up = { 0, 1, 0 };
+    float cos_angle, sin_angle, angle;
 
     glUseProgram(tree->shader);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tree->texture);
 
     for (int i = 0; i < tree->nbTrees; i++) {
-        modelToWorld = T(tree->pos[i].x, tree->pos[i].y, tree->pos[i].z);
+
+        new_normal = VectorSub(camera.pos, tree->pos[i]);
+        new_normal.y = 0;
+        new_normal = Normalize(new_normal);
+        cos_angle = DotProduct(new_normal, old_normal);
+        sin_angle = DotProduct(CrossProduct(new_normal, old_normal), up);
+        angle = acos(cos_angle);
+        if (sin_angle > 0)
+            angle *= -1;
+        rot = Ry(angle);
+
+       // rot = RotateTowards(old_normal, new_normal);
+
+        modelToWorld = Mult(T(tree->pos[i].x, tree->pos[i].y, tree->pos[i].z), rot);
         modelToView = Mult(worldToView, modelToWorld);
         glUniformMatrix4fv(glGetUniformLocation(tree->shader, "modelviewMatrix"), 1, GL_TRUE, modelToView.m);
         DrawModel(tree->model, tree->shader, "inPosition", NULL, "inTexCoord");

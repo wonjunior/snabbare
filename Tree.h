@@ -6,6 +6,7 @@
 #include "LoadTGA.h"
 
 #include "Terrain.h"
+#include "Camera.h"
 
 
 typedef struct {
@@ -17,5 +18,5 @@ typedef struct {
 } Tree;
 
 Tree* loadTrees(char* fileTexture, const char* mapFile, Terrain* terrain, GLuint shader);
-void drawTrees(Tree* tree, mat4 worldToView);
+void drawTrees(Tree* tree, mat4 worldToView, const Camera cam);
 void loadTreesPositions(Tree* tree, const Terrain* terrain, char* mapFile);

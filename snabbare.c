@@ -273,7 +273,7 @@ void display(void)
     drawCar(subaru);
 
     drawForest(forest, worldToView);
-    drawTrees(tree, worldToView);
+    drawTrees(tree, worldToView, camera);
     glUseProgram(program);
 
 
