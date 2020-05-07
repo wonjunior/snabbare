@@ -4,14 +4,15 @@ int oldMouseX = 0, oldMouseY = 0;
 
 Camera createCamera() {
 
-    Camera camera = { CAM_BEHIND,
-                    { 10,-5,10 },
-                    { 0,1,0 },
-                    { 0, 0, 0 },
-                    {0, 0, 0},
-                    12,
-                    4,
-                    3,
+    Camera camera = 
+    { 
+        CAM_BEHIND,
+        { 10, -5, 10 },
+        { 0, 1, 0 },
+        { 0, 0, 0 },
+        { 0, 0, 0 },
+        { 20, 7 , 3 },
+        { 0.5, 3.6, 3.6 },
     };
     camera.forward = Normalize(camera.forward);
     return camera;
@@ -69,6 +70,8 @@ void moveGodCamera(Camera* camera, char key) {
 
     case 'c':
         if (camera->mode == CAM_BEHIND)
+            camera->mode = CAM_COCKPIT;
+        else if (camera->mode == CAM_COCKPIT)
             camera->mode = CAM_GOD;
         else
         {
@@ -85,9 +88,19 @@ void updateCamera(Camera* cam, Car* car) {
 
     if (cam->mode == CAM_BEHIND)
     {
-        cam->pos = VectorSub(car->pos, ScalarMult(Normalize(car->front), cam->distance));
-        cam->pos = VectorAdd(cam->pos, ScalarMult(Normalize(cam->up), cam->height));
-        cam->lookat = VectorAdd(car->pos, ScalarMult(Normalize(cam->up), cam->tilt));
+        cam->pos = VectorSub(car->pos, ScalarMult(Normalize(car->front), cam->behindTransform.distance));
+        cam->pos = VectorAdd(cam->pos, ScalarMult(Normalize(cam->up), cam->behindTransform.height));
+        cam->lookat = VectorAdd(car->pos, ScalarMult(Normalize(cam->up), cam->behindTransform.tilt));
+    }
+    else if (cam->mode == CAM_COCKPIT)
+    {
+        cam->pos = VectorSub(car->pos, ScalarMult(Normalize(car->front), cam->cockpitTransform.distance));
+        cam->pos = VectorAdd(cam->pos, ScalarMult(Normalize(cam->up), cam->cockpitTransform.height));
+        cam->lookat = VectorAdd(car->pos, ScalarMult(Normalize(cam->up), cam->cockpitTransform.tilt));
+
+        vec3 left = Normalize(CrossProduct(cam->up, VectorSub(cam->lookat, cam->pos)));
+        cam->pos = VectorAdd(cam->pos, ScalarMult(left, 1.1));
+        cam->lookat = VectorAdd(cam->lookat, ScalarMult(left, 1.1));
     }
     else if (cam->mode == CAM_GOD)
         cam->lookat = VectorAdd(cam->pos, cam->forward);

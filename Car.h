@@ -6,10 +6,12 @@
 #include "LoadTGA.h"
 
 #include "Terrain.h"
+//#include "Camera.h"
 
 
 typedef struct {
-    Model* model;
+    Model* cockpit;
+    Model* frame;
     GLuint texture;
     GLuint shader;
     vec3 pos;
@@ -25,9 +27,8 @@ enum { CTRL_GAS, CTRL_BRAKE, CTRL_LEFT, CTRL_RIGHT };
 
 void updateCar(Car* subaru, const char* controls);
 
-Car* loadCar(GLuint shader, char* model, char* texture);
-void freeCar(Car* car);
-void drawCar(Car* car);
+Car* loadCar(GLuint shader, char* cockpitModel, char* texture);//, char* frameModel, char* texture);
+void drawCar(Car* car, int cameraMode);
 void setCarHeight(Car* car, Terrain* terrain);
 void setCarUp(Car* car, Terrain* terrain);
 void updateCar(Car* subaru);

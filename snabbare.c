@@ -206,12 +206,12 @@ void init(void)
  
 
     // ------------------- Load models
-    subaru = loadCar(program, "models/fiat.obj", "textures/orange.tga");
+    subaru = loadCar(program, "models/cockpit.obj", "models/frame.obj", "textures/orange.tga");
 
     loadShaderParams(program);
 
     GLuint terrainShader = loadShaders("shaders/terrain.vert", "shaders/terrain.frag");
-    terrain = GenerateTerrain(terrainShader, "textures/hugo1.tga", "textures/terrain_multitex.tga");
+    terrain = GenerateTerrain(terrainShader, "textures/heightmap.tga", "textures/terrain_multitex.tga");
     loadShaderParams(terrain->shader);
 
 
@@ -270,7 +270,7 @@ void display(void)
     glUseProgram(program); // temporary default shader
     updateCar(subaru, controls);
 
-    drawCar(subaru);
+    drawCar(subaru, camera.mode);
 
     drawForest(forest, worldToView);
     drawTrees(tree, worldToView, camera);

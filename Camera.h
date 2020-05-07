@@ -10,9 +10,15 @@
 
 typedef enum {
     CAM_BEHIND,
-    CAM_FRONT,
+    CAM_COCKPIT,
     CAM_GOD,
 } CameraMode;
+
+typedef struct {
+    float distance;
+    float height;
+    float tilt;
+} CameraTransform;
 
 typedef struct {
     CameraMode mode;
@@ -20,12 +26,9 @@ typedef struct {
     vec3 up;
     vec3 pos;
     vec3 lookat;
-    float distance;
-    float height;
-    float tilt;
+    CameraTransform behindTransform;
+    CameraTransform cockpitTransform;
 } Camera;
-
-
 
 Camera createCamera();
 void rotateGodCamera(Camera* cam, int x, int y);

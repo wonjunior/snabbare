@@ -1,15 +1,16 @@
 #include "Car.h"
 
 
-Car* loadCar(GLuint shader, char* modelFile, char textureFile[])
+Car* loadCar(GLuint shader, char* cockpitModel, char* frameModel, char textureFile[])
 {
     Car* car = malloc(sizeof(Car));
     if (car == NULL) {
         printf("Failed to allocate memory for Car struct (loadCar)");
     }
 
-    car->model = LoadModelPlus(modelFile);
-    if (car->model == NULL) {
+    car->cockpit = LoadModelPlus(cockpitModel);
+    car->frame = LoadModelPlus(frameModel);
+    if (car->cockpit == NULL) {
         printf("Failed to allocate memory for Model struct (loadCar)");
     }
 
@@ -35,7 +36,7 @@ Car* loadCar(GLuint shader, char* modelFile, char textureFile[])
     return car;
 }
 
-void drawCar(Car* car) {
+void drawCar(Car* car, int cameraMode) {
 
     //texture
     glActiveTexture(GL_TEXTURE0);
@@ -44,9 +45,12 @@ void drawCar(Car* car) {
 
     mat4 modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), car->rotation);
 
-
     glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
-    DrawModel(car->model, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+
+    if (cameraMode == 1)
+        DrawModel(car->cockpit, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+    else
+        DrawModel(car->frame, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 }
 
 void setCarHeight(Car* car, Terrain* terrain)
