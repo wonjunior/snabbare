@@ -1,7 +1,7 @@
 #include "Car.h"
 
 
-Car* loadCar(GLuint shader, char* cockpitModel, char* frameModel, char textureFile[])
+Car* loadCar(GLuint shader, char* cockpitModel, char* frameModel, char* textureFile)
 {
     Car* car = malloc(sizeof(Car));
     if (car == NULL) {
@@ -36,7 +36,7 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* frameModel, char textureFi
     return car;
 }
 
-void drawCar(Car* car, int cameraMode) {
+void drawCar(Car* car, CameraMode cameraMode) {
 
     //texture
     glActiveTexture(GL_TEXTURE0);
@@ -47,7 +47,7 @@ void drawCar(Car* car, int cameraMode) {
 
     glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
 
-    if (cameraMode == 1)
+    if (cameraMode == CAM_COCKPIT)
         DrawModel(car->cockpit, car->shader, "in_Position", "in_Normal", "in_TexCoord");
     else
         DrawModel(car->frame, car->shader, "in_Position", "in_Normal", "in_TexCoord");

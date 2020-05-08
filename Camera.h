@@ -6,8 +6,6 @@
 #include "loadobj.h"
 #include "LoadTGA.h"
 
-#include "Car.h"
-
 typedef enum {
     CAM_BEHIND,
     CAM_COCKPIT,
@@ -29,6 +27,8 @@ typedef struct {
     CameraTransform behindTransform;
     CameraTransform cockpitTransform;
 } Camera;
+
+#include "Car.h"
 
 Camera createCamera();
 void rotateGodCamera(Camera* cam, int x, int y);
