@@ -29,7 +29,7 @@ Terrain* GenerateTerrain(GLuint shader, char* textureFileName, char* terrainText
         {
             // Vertex array. You need to scale this properly
             vertexArray[(x + z * tex.width) * 3 + 0] = x / 1.0;
-            vertexArray[(x + z * tex.width) * 3 + 1] = 0.0;//tex.imageData[(x + z * tex.width) * (tex.bpp / 8)] / (5.0 * 2.0);
+            vertexArray[(x + z * tex.width) * 3 + 1] = tex.imageData[(x + z * tex.width) * (tex.bpp / 8)] / (5.0 * 2.0)*2.5;
             vertexArray[(x + z * tex.width) * 3 + 2] = z / 1.0;
         }
     }

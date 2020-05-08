@@ -11,12 +11,13 @@
 
 typedef struct {
     Model* model;
-    GLuint texture;
+    GLuint* textures;
     GLuint shader;
     vec3* pos;
     int nbTrees;
+    int nbTextures;
 } Tree;
 
-Tree* loadTrees(char* fileTexture, const char* mapFile, Terrain* terrain, GLuint shader);
+Tree* loadTrees(const char** textureFiles, int nbTextures, const char* mapFile, Terrain* terrain, GLuint shader);
 void drawTrees(Tree* tree, mat4 worldToView, const Camera cam);
 void loadTreesPositions(Tree* tree, const Terrain* terrain, char* mapFile);

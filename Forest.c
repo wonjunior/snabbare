@@ -13,20 +13,21 @@ Forest* loadForest(float xmax, char* fileTexture, GLuint shader) {
     LoadTGATextureSimple(fileTexture, &forest->texture);
 //    float texture_size = 100
     float repetitions = 2;
-    float h = 150;
+    float h = 200;
+    float h0 = 25;
 
     GLfloat vertices[] =
-    {   0.0, 0.0, 0.0,
-        0.0, h, 0.0,
-        xmax, 0.0, 0.0,
-        xmax, h, 0.0,
-        xmax, 0.0, xmax,
-        xmax, h, xmax,
-        0.0, 0.0, xmax,
-        0.0, h, xmax,
+    {   0.0, h0, 0.0,
+        0.0, h0 + h, 0.0,
+        xmax, h0, 0.0,
+        xmax, h0 + h, 0.0,
+        xmax, h0, xmax,
+        xmax, h0 + h, xmax,
+        0.0, h0, xmax,
+        0.0, h0 + h, xmax,
 
-        0.0, 0.0, 0.0,
-        0.0, h, 0.0
+        0.0, h0, 0.0,
+        0.0, h0 + h, 0.0
     };
 
     GLuint indices[] = {

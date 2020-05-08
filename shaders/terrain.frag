@@ -58,9 +58,9 @@ void main(void)
    
     vec4 texColor = vec4((textureMap.r * sandTex + textureMap.g * grassTex + textureMap.b * concreteTex)/4, 1);
 
-    if (enableLight)
-        out_Color = vec4(shade, (enableTransparency ? 0.5 : 1.0)) * texColor * (nightMode ? 0.15 : 1) + 0.1;
-    else
-        out_Color = texColor * (nightMode ? 0.15 : 1);
+    //if (enableLight)
+        out_Color = 5.0 * vec4(shade, 1.0) * texColor + 0.1; //(nightMode ? 0.15 : 1) + 0.1;
+    //else
+        //out_Color = texColor * (nightMode ? 0.15 : 1);
 }
 

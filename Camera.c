@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-int oldMouseX = 0, oldMouseY = 0;
+static int oldMouseX = 0, oldMouseY = 0;
 
 Camera createCamera() {
 
@@ -13,6 +13,7 @@ Camera createCamera() {
         { 0, 0, 0 },
         { 20, 7 , 3 },
         { 0.5, 3.6, 3.6 },
+
     };
     camera.forward = Normalize(camera.forward);
     return camera;

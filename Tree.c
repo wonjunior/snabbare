@@ -1,16 +1,22 @@
 #include "Tree.h"
 
 
-Tree* loadTrees(char* fileTexture, const char* mapFile, Terrain* terrain, GLuint shader) {
+Tree* loadTrees(char** textureFiles, int nbTextures, const char* mapFile, Terrain* terrain, GLuint shader) {
 
     Tree* tree = malloc(sizeof(Tree));
     if (tree == NULL)
         printf("failed to allocate forest struct");
 
     tree->shader = shader;
+    tree->nbTextures = nbTextures;
+    tree->textures = malloc(nbTextures * sizeof(GLuint));
+
+    for (int i = 0;i < nbTextures; i++) {
+        LoadTGATextureSimple(textureFiles[i], &tree->textures[i]);
+    }
 
 
-    LoadTGATextureSimple(fileTexture, &tree->texture);
+
     //    float texture_size = 100
     float repetitions = 2;
     float h = 10.8;
@@ -50,10 +56,11 @@ void drawTrees(Tree* tree, mat4 worldToView, const Camera camera) {
 
     glUseProgram(tree->shader);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tree->texture);
+    
 
     for (int i = 0; i < tree->nbTrees; i++) {
 
+        glBindTexture(GL_TEXTURE_2D, tree->textures[i % tree->nbTextures]);
         new_normal = VectorSub(camera.pos, tree->pos[i]);
         new_normal.y = 0;
         new_normal = Normalize(new_normal);

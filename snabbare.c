@@ -22,6 +22,9 @@
 #include "Forest.h"
 #include "Tree.h"
 
+#include <windows.h>
+#include <stdio.h>
+
 // Globals
 #define PI 3.1415
 #define WORLD_SIZE 100.0
@@ -81,9 +84,9 @@ vec3 lightSourcesDirectionsPositions[] =
 vec3 lightSourcesColorsArr[] =
 {
     {1.0f, 1.0f, 1.0f}, 		// White light
-    {1.0f, 1.0f, 1.0f}, 		// White light
-    {1.0f, 1.0f, 1.0f}, 		// White light
-    {1.0f, 1.0f, 1.0f}, 		// White light
+    {0.2f, 0.2f, 0.2f}, 		// White light
+    {0.2f, 0.2f, 0.2f}, 		// White light
+    {0.2f, 0.2f, 0.2f}, 		// White light
 };
 
 GLint isDirectional[] = { 0,0,0,0 };
@@ -206,19 +209,24 @@ void init(void)
  
 
     // ------------------- Load models
+
     subaru = loadCar(program, "models/cockpit.obj", "models/frame.obj", "textures/orange.tga");
 
     loadShaderParams(program);
 
     GLuint terrainShader = loadShaders("shaders/terrain.vert", "shaders/terrain.frag");
+
     terrain = GenerateTerrain(terrainShader, "textures/heightmap.tga", "textures/terrain_multitex.tga");
+
     loadShaderParams(terrain->shader);
 
 
     GLuint billboardShader = loadShaders("shaders/forest.vert", "shaders/forest.frag");
     forest = loadForest(terrain->w, "textures/forest_3.tga", billboardShader);
     initBillboardShader(billboardShader);
-    tree = loadTrees("textures/tree2.tga", "textures/tree_map.tga", terrain, billboardShader);
+
+    char* treeFiles[] = {"textures/tree3.tga", "textures/tree1.tga", "textures/tree2.tga"};
+    tree = loadTrees(treeFiles, 3, "textures/tree_map.tga", terrain, billboardShader);
     
 
     glUseProgram(program);
@@ -229,15 +237,16 @@ GLfloat a, b = 0.0;
 
 void display(void)
 {
+   
     setCarHeight(subaru, terrain);
-    setCarUp(subaru, terrain);
+    //setCarUp(subaru, terrain);
     // clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUniform1ui(glGetUniformLocation(program, "enableTransparency"), false);
 
     // night node activated
-    glUniform1ui(glGetUniformLocation(program, "NIGHT_MODE"), NIGHT_MODE);
+    glUniform1ui(glGetUniformLocation(program, "NIGHT_MODE"), 0);
 
     // update modelToView matrix
     GLfloat t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
@@ -261,6 +270,17 @@ void display(void)
     //glBindTexture(GL_TEXTURE_2D, grassTexture);
 
     glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "worldToView"), 1, GL_TRUE, worldToView.m);
+
+    vec3 carLightPos = { 0,0,0 };
+    //light updtae
+    
+    lightSourcesDirectionsPositions[0].x = camera.pos.x;
+    lightSourcesDirectionsPositions[0].y = camera.pos.y;
+    lightSourcesDirectionsPositions[0].z = camera.pos.z;
+    glUseProgram(terrain->shader);
+    glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
+    glUseProgram(program);
+    glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
     DrawTerrain(terrain, modelToWorld);
 
     if (showNormals)
@@ -268,9 +288,10 @@ void display(void)
 
     glUniformMatrix4fv(glGetUniformLocation(program, "worldToView"), 1, GL_TRUE, worldToView.m);
     glUseProgram(program); // temporary default shader
-    updateCar(subaru, controls);
+    updateCar(subaru, controls, terrain);
 
     drawCar(subaru, camera.mode);
+
 
     drawForest(forest, worldToView);
     drawTrees(tree, worldToView, camera);
@@ -283,6 +304,7 @@ void display(void)
 
 int main(int argc, char* argv[])
 {
+    //PlaySound("c:\\cb.wav", NULL, SND_ASYNC);
     printf("Snabbare");
     glutInit(&argc, argv);
     glutInitContextVersion(3, 2);

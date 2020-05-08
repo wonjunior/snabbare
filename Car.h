@@ -25,7 +25,7 @@ typedef struct {
 
 enum { CTRL_GAS, CTRL_BRAKE, CTRL_LEFT, CTRL_RIGHT };
 
-void updateCar(Car* subaru, const char* controls);
+void updateCar(Car* subaru, const char* controls, Terrain* terrain);
 
 Car* loadCar(GLuint shader, char* cockpitModel, char* texture);//, char* frameModel, char* texture);
 void drawCar(Car* car, int cameraMode);

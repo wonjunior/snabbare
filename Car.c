@@ -136,16 +136,16 @@ void setCarUp(Car* car, Terrain* terrain)
     car->up = newUp;*/
 }
 
-void updateCar(Car* subaru, const char* controls)
+void updateCar(Car* subaru, const char* controls, Terrain* terrain)
 {
     
-    float turningSensibility = 0.01;
+    float turningSensibility = 0.02;
     float naturalSpeedDecrease = 0.0002;
-    float v_max = 0.2;
+    float v_max = 1;
 
     if (controls[CTRL_GAS]) {
         if (subaru->speed < v_max)
-            subaru->speed += 0.0005;
+            subaru->speed += 0.01;
         else
             subaru->speed = v_max;
         /**
@@ -167,8 +167,9 @@ void updateCar(Car* subaru, const char* controls)
     }
    
     if (controls[CTRL_BRAKE]) {
-        if (subaru->speed >= 0.005)
         subaru->speed -= 0.005;
+        if (subaru->speed < 0)
+            subaru->speed = 0;
     }
     if (controls[CTRL_LEFT]) {
         subaru->direction = MultVec3(Ry(turningSensibility), subaru->direction);
@@ -181,7 +182,28 @@ void updateCar(Car* subaru, const char* controls)
         subaru->rotation = Mult(subaru->rotation, Ry(-turningSensibility));
     }
 
+   
     
     subaru->pos = VectorAdd(subaru->pos, ScalarMult(Normalize(subaru->direction), subaru->speed));
+
+    int const border = 5;
+    if (subaru->pos.x > terrain->w - border) {
+        subaru->pos.x = terrain->w - border;
+        subaru->direction.x = 0;
+    }
+    else if (subaru->pos.x < border) {
+        subaru->pos.x = border;
+        subaru->direction.x = 0;
+    }
+    else if (subaru->pos.z > terrain->w - border) {
+        subaru->pos.z = terrain->w - border;
+        subaru->direction.z = 0;
+    }
+    else if (subaru->pos.z < border) {
+        subaru->pos.z = border;
+        subaru->direction.z = 0;
+    }
+    //subaru->speed *= sqrt(DotProduct(subaru->direction, subaru->direction));
+   // subaru->direction = Normalize(subaru->direction);
 
 }
