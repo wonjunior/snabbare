@@ -8,6 +8,7 @@
 
 typedef struct {
     Model* cockpit;
+    Model* steeringWheel;
     Model* frame;
     GLuint texture;
     GLuint shader;

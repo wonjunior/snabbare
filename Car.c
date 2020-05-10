@@ -1,7 +1,7 @@
 #include "Car.h"
 
 
-Car* loadCar(GLuint shader, char* cockpitModel, char* frameModel, char* textureFile)
+Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* frameModel, char* textureFile)
 {
     Car* car = malloc(sizeof(Car));
     if (car == NULL) {
@@ -9,6 +9,7 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* frameModel, char* textureF
     }
 
     car->cockpit = LoadModelPlus(cockpitModel);
+    car->steeringWheel = LoadModelPlus(steeringWheelModel);
     car->frame = LoadModelPlus(frameModel);
     if (car->cockpit == NULL) {
         printf("Failed to allocate memory for Model struct (loadCar)");
@@ -48,15 +49,21 @@ void drawCar(Car* car, CameraMode cameraMode) {
     //glUniform1i(glGetUniformLocation(car->shader, "texUnit"), 0);
 
     car->front = car->direction;
-   // vec3 halfCarSize = { 0, 0, 5 };
-   // mat4 midToBack = T(halfCarSize.x, halfCarSize.y, halfCarSize.z);
-   // mat4 modelToWorld = Mult(car->rotation, midToBack);
-   mat4 modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), car->rotation);
+    // vec3 halfCarSize = { 0, 0, 5 };
+    // mat4 midToBack = T(halfCarSize.x, halfCarSize.y, halfCarSize.z);
+    // mat4 modelToWorld = Mult(car->rotation, midToBack);
+    mat4 modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), car->rotation);
 
     glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
 
-    if (cameraMode == CAM_COCKPIT)
+    if (cameraMode == CAM_COCKPIT) {
         DrawModel(car->cockpit, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+
+        mat4 steeringWheelToCar = Mult(T(1.1, 2.7, 1.3), Rx(0.4));
+        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, steeringWheelToCar));
+        glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
+        DrawModel(car->steeringWheel, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+    }
     else
         DrawModel(car->frame, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 }
@@ -146,7 +153,7 @@ void setCarUp(Car* car, Terrain* terrain)
 
 void updateCar(Car* subaru, const char* controls, Terrain* terrain)
 {
-    
+
     float turningSensibility = 0.06;
     float naturalSpeedDecrease = 0.0002;
     float v_max = 1;
@@ -175,7 +182,7 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
         else
             subaru->speed = 0;
     }
-   
+
     if (controls[CTRL_BRAKE]) {
         subaru->speed -= 0.005;
         if (subaru->speed < 0)
@@ -189,12 +196,12 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
             subaru->steering += turningSensibility;
         }
         else {
-           
+
             if (subaru->steering < 0)
                 subaru->steering += steering_return;
             else if (subaru->steering > 0)
                 subaru->steering -= steering_return;
-              
+
         }
 
 
@@ -211,8 +218,8 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
             subaru->rotation = Mult(subaru->rotation, Ry(-radial_speed));
         }
     }
-   
-    
+
+
     subaru->pos = VectorAdd(subaru->pos, ScalarMult(Normalize(subaru->direction), subaru->speed));
     subaru->left = Normalize(CrossProduct(subaru->up, subaru->front));
 
