@@ -59,7 +59,7 @@ void drawCar(Car* car, CameraMode cameraMode) {
     if (cameraMode == CAM_COCKPIT) {
         DrawModel(car->cockpit, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 
-        mat4 steeringWheelToCar = Mult(T(1.1, 2.7, 1.3), Rx(0.4));
+        mat4 steeringWheelToCar = Mult(T(1.1, 2.7, 1.3), Mult(Rx(0.4), Rz(0.75 * car->steering)));
         modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, steeringWheelToCar));
         glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
         DrawModel(car->steeringWheel, car->shader, "in_Position", "in_Normal", "in_TexCoord");
