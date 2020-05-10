@@ -30,9 +30,13 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* frameModel, char* textureF
     car->up.x = 0;
     car->up.y = 1;
     car->up.z = 0;
+    car->left.x = 1;
+    car->left.y = 0;
+    car->left.z = 0;
     car->rotation = IdentityMatrix();
     car->speed = 0.05;
     car->gas = 0.0;
+    car->steering = 0;
     return car;
 }
 
@@ -43,7 +47,11 @@ void drawCar(Car* car, CameraMode cameraMode) {
     glBindTexture(GL_TEXTURE_2D, car->texture);
     //glUniform1i(glGetUniformLocation(car->shader, "texUnit"), 0);
 
-    mat4 modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), car->rotation);
+    car->front = car->direction;
+   // vec3 halfCarSize = { 0, 0, 5 };
+   // mat4 midToBack = T(halfCarSize.x, halfCarSize.y, halfCarSize.z);
+   // mat4 modelToWorld = Mult(car->rotation, midToBack);
+   mat4 modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), car->rotation);
 
     glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
 
@@ -139,9 +147,11 @@ void setCarUp(Car* car, Terrain* terrain)
 void updateCar(Car* subaru, const char* controls, Terrain* terrain)
 {
     
-    float turningSensibility = 0.02;
+    float turningSensibility = 0.06;
     float naturalSpeedDecrease = 0.0002;
     float v_max = 1;
+    float steering_return = turningSensibility / 2;
+    float r_min = 40;
 
     if (controls[CTRL_GAS]) {
         if (subaru->speed < v_max)
@@ -171,39 +181,64 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
         if (subaru->speed < 0)
             subaru->speed = 0;
     }
-    if (controls[CTRL_LEFT]) {
-        subaru->direction = MultVec3(Ry(turningSensibility), subaru->direction);
-        subaru->front = MultVec3(Ry(turningSensibility), subaru->front);
-        subaru->rotation = Mult(subaru->rotation, Ry(turningSensibility));
-    }
-    if (controls[CTRL_RIGHT]) {
-        subaru->direction = MultVec3(Ry(-turningSensibility), subaru->direction);
-        subaru->front = MultVec3(Ry(-turningSensibility), subaru->front);
-        subaru->rotation = Mult(subaru->rotation, Ry(-turningSensibility));
-    }
+    if (subaru->speed > 0) {
+        if (controls[CTRL_LEFT]) {
+            subaru->steering -= turningSensibility;
+        }
+        else if (controls[CTRL_RIGHT]) {
+            subaru->steering += turningSensibility;
+        }
+        else {
+           
+            if (subaru->steering < 0)
+                subaru->steering += steering_return;
+            else if (subaru->steering > 0)
+                subaru->steering -= steering_return;
+              
+        }
 
+
+        if (subaru->steering > 1)
+            subaru->steering = 1;
+        else if (subaru->steering < -1)
+            subaru->steering = -1;
+
+        if (subaru->steering != 0) {
+            float r = r_min / subaru->steering;
+            float radial_speed = subaru->speed / r;
+            subaru->direction = MultVec3(Ry(-radial_speed), subaru->direction);
+            subaru->front = MultVec3(Ry(-radial_speed), subaru->front);
+            subaru->rotation = Mult(subaru->rotation, Ry(-radial_speed));
+        }
+    }
    
     
     subaru->pos = VectorAdd(subaru->pos, ScalarMult(Normalize(subaru->direction), subaru->speed));
+    subaru->left = Normalize(CrossProduct(subaru->up, subaru->front));
 
+    handleCollisions(subaru, terrain);
+
+}
+
+
+void handleCollisions(Car* subaru, const Terrain* terrain) {
     int const border = 5;
     if (subaru->pos.x > terrain->w - border) {
         subaru->pos.x = terrain->w - border;
-        subaru->direction.x = 0;
+        //subaru->direction.x = 0;
     }
-    else if (subaru->pos.x < border) {
+    if (subaru->pos.x < border) {
         subaru->pos.x = border;
-        subaru->direction.x = 0;
+        //subaru->direction.x = 0;
     }
-    else if (subaru->pos.z > terrain->w - border) {
+    if (subaru->pos.z > terrain->w - border) {
         subaru->pos.z = terrain->w - border;
-        subaru->direction.z = 0;
+        //subaru->direction.z = 0;
     }
-    else if (subaru->pos.z < border) {
+    if (subaru->pos.z < border) {
         subaru->pos.z = border;
-        subaru->direction.z = 0;
+        //subaru->direction.z = 0;
     }
     //subaru->speed *= sqrt(DotProduct(subaru->direction, subaru->direction));
    // subaru->direction = Normalize(subaru->direction);
-
 }

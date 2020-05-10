@@ -33,4 +33,4 @@ typedef struct {
 Camera createCamera();
 void rotateGodCamera(Camera* cam, int x, int y);
 void moveGodCamera(Camera* camera, char key);
-void updateCamera(Camera* cam, Car* car);
+void updateCamera(Camera* cam, Car* car, char controls[]);

@@ -85,13 +85,19 @@ void moveGodCamera(Camera* camera, char key) {
     }
 }
 
-void updateCamera(Camera* cam, Car* car) {
+void updateCamera(Camera* cam, Car* car, char controls[]) {
 
     if (cam->mode == CAM_BEHIND)
     {
-        cam->pos = VectorSub(car->pos, ScalarMult(Normalize(car->front), cam->behindTransform.distance));
+
+        float conv = 0.05;
+        car->front = car->direction;//for now ...
+        cam->forward = VectorAdd(cam->forward, ScalarMult(VectorSub(car->front, cam->forward), conv));
+
+        cam->pos = VectorSub(car->pos, ScalarMult(Normalize(cam->forward), cam->behindTransform.distance));
         cam->pos = VectorAdd(cam->pos, ScalarMult(Normalize(cam->up), cam->behindTransform.height));
         cam->lookat = VectorAdd(car->pos, ScalarMult(Normalize(cam->up), cam->behindTransform.tilt));
+
     }
     else if (cam->mode == CAM_COCKPIT)
     {
@@ -99,9 +105,8 @@ void updateCamera(Camera* cam, Car* car) {
         cam->pos = VectorAdd(cam->pos, ScalarMult(Normalize(cam->up), cam->cockpitTransform.height));
         cam->lookat = VectorAdd(car->pos, ScalarMult(Normalize(cam->up), cam->cockpitTransform.tilt));
 
-        vec3 left = Normalize(CrossProduct(cam->up, VectorSub(cam->lookat, cam->pos)));
-        cam->pos = VectorAdd(cam->pos, ScalarMult(left, 1.1));
-        cam->lookat = VectorAdd(cam->lookat, ScalarMult(left, 1.1));
+        cam->pos = VectorAdd(cam->pos, ScalarMult(car->left, 1.1));
+        cam->lookat = VectorAdd(cam->lookat, ScalarMult(car->left, 1.1));
     }
     else if (cam->mode == CAM_GOD)
         cam->lookat = VectorAdd(cam->pos, cam->forward);

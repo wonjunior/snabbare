@@ -15,9 +15,13 @@ typedef struct {
     vec3 direction;
     vec3 front;
     vec3 up;
+    vec3 left;
+    vec3 speedVec;
     mat4 rotation;
+    float steering;
     float speed;
     float gas;
+    float halfLength;
 } Car;
 
 
@@ -37,3 +41,4 @@ void setCarUp(Car* car, Terrain* terrain);
 void updateCar(Car* subaru);
 
 mat4 RotateTowards(vec3 src, vec3 dest);
+void handleCollisions(Car* subaru, const Terrain* terrain);

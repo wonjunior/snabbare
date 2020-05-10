@@ -238,7 +238,7 @@ GLfloat a, b = 0.0;
 void display(void)
 {
    
-    setCarHeight(subaru, terrain);
+    
     //setCarUp(subaru, terrain);
     // clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -256,7 +256,7 @@ void display(void)
     mat4 modelToWorld = Mult(T(0, 0, 0), Ry(0));
     mat4 worldToView;
 
-    updateCamera(&camera, subaru);
+    updateCamera(&camera, subaru, controls);
 
     worldToView = lookAtv(camera.pos, camera.lookat, camera.up);
 
@@ -289,7 +289,7 @@ void display(void)
     glUniformMatrix4fv(glGetUniformLocation(program, "worldToView"), 1, GL_TRUE, worldToView.m);
     glUseProgram(program); // temporary default shader
     updateCar(subaru, controls, terrain);
-
+    setCarHeight(subaru, terrain);
     drawCar(subaru, camera.mode);
 
 
