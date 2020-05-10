@@ -1,7 +1,7 @@
 #include "Car.h"
 
 
-Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* frameModel, char* textureFile)
+Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* frameModel, char* tireModel, char* textureFile)
 {
     Car* car = malloc(sizeof(Car));
     if (car == NULL) {
@@ -11,6 +11,7 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* 
     car->cockpit = LoadModelPlus(cockpitModel);
     car->steeringWheel = LoadModelPlus(steeringWheelModel);
     car->frame = LoadModelPlus(frameModel);
+    car->tire = LoadModelPlus(tireModel);
     if (car->cockpit == NULL) {
         printf("Failed to allocate memory for Model struct (loadCar)");
     }
@@ -64,8 +65,19 @@ void drawCar(Car* car, CameraMode cameraMode) {
         glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
         DrawModel(car->steeringWheel, car->shader, "in_Position", "in_Normal", "in_TexCoord");
     }
-    else
+    else {
         DrawModel(car->frame, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+
+        mat4 tireWheelToCar = Mult(T(2.5, 0.9, 4.2), Ry(-0.6 * car->steering));
+        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, tireWheelToCar));
+        glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
+        DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+
+        tireWheelToCar = Mult(T(-2.5, 0.9, 4.2), Ry(3.14 - 0.6 * car->steering));
+        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, tireWheelToCar));
+        glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
+        DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+    }
 }
 
 void setCarHeight(Car* car, Terrain* terrain)

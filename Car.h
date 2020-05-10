@@ -10,6 +10,7 @@ typedef struct {
     Model* cockpit;
     Model* steeringWheel;
     Model* frame;
+    Model* tire;
     GLuint texture;
     GLuint shader;
     vec3 pos;
@@ -35,7 +36,7 @@ enum { CTRL_GAS, CTRL_BRAKE, CTRL_LEFT, CTRL_RIGHT };
 
 void updateCar(Car* subaru, const char* controls, Terrain* terrain);
 
-Car* loadCar(GLuint shader, char* cockpitModel, char* frameModel, char* texture);
+Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* frameModel, char* tireModel, char* textureFile);
 void drawCar(Car* car, CameraMode cameraMode);
 void setCarHeight(Car* car, Terrain* terrain);
 void setCarUp(Car* car, Terrain* terrain);
