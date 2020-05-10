@@ -1,5 +1,5 @@
 #include "Car.h"
-
+#include <math.h>
 
 Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* frameModel, char* tireModel, char* textureFile)
 {
@@ -60,7 +60,8 @@ void drawCar(Car* car, CameraMode cameraMode) {
     if (cameraMode == CAM_COCKPIT) {
         DrawModel(car->cockpit, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 
-        mat4 steeringWheelToCar = Mult(T(1.1, 2.7, 1.3), Mult(Rx(0.4), Rz(0.75 * car->steering)));
+        float angle = car->steering > 0 ? (car->steering < 0.2 ? 0 : car->steering) : (-car->steering < 0.2 ? 0 : car->steering);
+        mat4 steeringWheelToCar = Mult(T(1.1, 2.7, 1.3), Mult(Rx(0.4), Rz(0.6*angle)));
         modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, steeringWheelToCar));
         glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
         DrawModel(car->steeringWheel, car->shader, "in_Position", "in_Normal", "in_TexCoord");
@@ -68,12 +69,12 @@ void drawCar(Car* car, CameraMode cameraMode) {
     else {
         DrawModel(car->frame, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 
-        mat4 tireWheelToCar = Mult(T(2.5, 0.9, 4.2), Ry(-0.6 * car->steering));
+        mat4 tireWheelToCar = Mult(T(2.5, 0.9, 4.2), Ry(-0.3 * car->steering));
         modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, tireWheelToCar));
         glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
         DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 
-        tireWheelToCar = Mult(T(-2.5, 0.9, 4.2), Ry(3.14 - 0.6 * car->steering));
+        tireWheelToCar = Mult(T(-2.5, 0.9, 4.2), Ry(3.14 - 0.3 * car->steering));
         modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, tireWheelToCar));
         glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
         DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
@@ -110,7 +111,6 @@ void setCarHeight(Car* car, Terrain* terrain)
     float weightB = (car->pos.x - a.x) * (car->pos.x > a.x ? +1 : -1);
     float weightC = (car->pos.z - a.z) * (car->pos.z > a.z ? +1 : -1);
     float weightA = 1 - weightB - weightC;
-    printf("%f\n", car->pos.x - a.x);
 
     car->pos.y = weightA * a.y + weightB * b.y + weightC * c.y;
 }
@@ -166,15 +166,16 @@ void setCarUp(Car* car, Terrain* terrain)
 void updateCar(Car* subaru, const char* controls, Terrain* terrain)
 {
 
-    float turningSensibility = 0.06;
-    float naturalSpeedDecrease = 0.0002;
+    float turningSensibility = 0.07;
+    float friction = 0.002;
     float v_max = 1;
-    float steering_return = turningSensibility / 2;
-    float r_min = 40;
+    float steering_return = turningSensibility * 2;
+    float max_steering = 2.0;
+    float r_min = 70;
 
     if (controls[CTRL_GAS]) {
         if (subaru->speed < v_max)
-            subaru->speed += 0.01;
+            subaru->speed += 0.008;
         else
             subaru->speed = v_max;
         /**
@@ -189,7 +190,7 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
     else {
         subaru->gas = 0;
         if (subaru->speed > 0) {
-            subaru->speed -= naturalSpeedDecrease;
+            subaru->speed -= 0.002 + friction * subaru->speed * subaru->speed;
         }
         else
             subaru->speed = 0;
@@ -217,10 +218,10 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
         }
 
 
-        if (subaru->steering > 1)
-            subaru->steering = 1;
-        else if (subaru->steering < -1)
-            subaru->steering = -1;
+        if (subaru->steering > max_steering)
+            subaru->steering = max_steering;
+        else if (subaru->steering < -max_steering)
+            subaru->steering = -max_steering;
 
         if (subaru->steering != 0) {
             float r = r_min / subaru->steering;
