@@ -183,6 +183,7 @@ void loadShaderParams(GLuint shader)
 
 void initBillboardShader(GLuint shader)
 {
+    glUniform1ui(glGetUniformLocation(shader, "ACTIVE_HUD"), 0);
     glUniformMatrix4fv(glGetUniformLocation(shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix);
     glUniform1i(glGetUniformLocation(shader, "texUnit"), 0);
 }
@@ -219,8 +220,7 @@ void init(void)
     skybox = CreateSkybox("models/skybox.obj", "textures/SkyBox512.tga", program);
  
     // ------------------- Load models
-
-    subaru = loadCar(program, "models/steering_wheel.obj", "models/steering_wheel.obj", "models/steering_wheel.obj", "models/tire.obj", "textures/orange.tga");
+    subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/frame.obj", "models/tire.obj", "textures/orange.tga");
     loadShaderParams(program);
 
 

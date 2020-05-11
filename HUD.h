@@ -13,12 +13,14 @@ typedef struct {
     GLuint mapTexture;
     GLuint carTexture;
     float size;
+    float offset;
     float terrainSize;
 } Minimap;
 
 typedef struct {
     Minimap minimap;
     GLuint shader;
+    float screenResolution;
 } HUD;
 
 HUD* loadHUD(GLuint shader, float terrainWidth);

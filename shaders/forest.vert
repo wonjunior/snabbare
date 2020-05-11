@@ -11,10 +11,14 @@ out vec2 texCoord;
 
 uniform mat4 modelviewMatrix;
 uniform mat4 projectionMatrix;
+uniform bool ACTIVE_HUD;
 
 void main(void)
 {
+    if (ACTIVE_HUD)
+        gl_Position = modelviewMatrix * vec4(inPosition, 1.0);
+    else
+        gl_Position = projectionMatrix * modelviewMatrix * vec4(inPosition, 1.0);
+
 	texCoord = inTexCoord;
-	
-	gl_Position = projectionMatrix * modelviewMatrix * vec4(inPosition, 1.0);
 }
