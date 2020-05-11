@@ -239,7 +239,7 @@ void init(void)
     tree = loadTrees(treeFiles, 3, "textures/tree_map.tga", terrain, billboardShader);
     
     // ------------------- Load HUD
-    hud = loadHUD(billboardShader);
+    hud = loadHUD(billboardShader, terrain->w);
 
     glUseProgram(program);
 }
@@ -300,20 +300,18 @@ void display(void)
         DrawNormals(terrain);
         
 
-
     glUniformMatrix4fv(glGetUniformLocation(program, "worldToView"), 1, GL_TRUE, worldToView.m);
     glUseProgram(program); // temporary default shader
     updateCar(subaru, controls, terrain);
     setCarHeight(subaru, terrain);
     drawCar(subaru, camera.mode);
 
-    //if (showForest)
-    //    drawForest(forest, worldToView);
-    //drawForest(forest, worldToView);
+    if (showForest)
+        drawForest(forest, worldToView);
     
     drawTrees(tree, worldToView, camera);
    
-    drawHUD(hud, camera, worldToView);
+    drawHUD(hud, worldToView, camera, subaru->pos);
 
     glUseProgram(program);
     glutSwapBuffers();
@@ -338,7 +336,6 @@ int main(int argc, char* argv[])
     glutKeyboardUpFunc(keyUpHandler);
     glutRepeatingTimer(20);
     //glutTimerFunc(20, &OnTimer, 0);
-   
 
     glutMainLoop();
     exit(0);

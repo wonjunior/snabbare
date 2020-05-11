@@ -8,16 +8,20 @@
 #include "Camera.h"
 
 typedef struct {
-    Model* model;
+    Model* mapBillboard;
+    Model* carBillboard;
+    GLuint mapTexture;
+    GLuint carTexture;
+    float size;
+    float terrainSize;
 } Minimap;
 
 typedef struct {
     Minimap minimap;
     GLuint shader;
-    GLuint texture;
 } HUD;
 
-HUD* loadHUD(GLuint shader);
-void drawHUD(HUD* hud, Camera cam, mat4 worldToView);
+HUD* loadHUD(GLuint shader, float terrainWidth);
+void drawHUD(HUD* hud, mat4 worldToView, Camera cam, vec3 carPos);
 
 mat4 RotateTowards(vec3 src, vec3 dest);
