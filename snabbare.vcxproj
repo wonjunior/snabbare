@@ -88,6 +88,7 @@
     <ClCompile Include="common\Windows\glew.c" />
     <ClCompile Include="common\Windows\MicroGlut.c" />
     <ClCompile Include="Car.c" />
+    <ClCompile Include="HUD.c" />
     <ClCompile Include="Skybox.c" />
     <ClCompile Include="snabbare.c" />
     <ClCompile Include="Forest.c" />
@@ -103,6 +104,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Car.h" />
     <ClInclude Include="Forest.h" />
+    <ClInclude Include="HUD.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Terrain.h" />

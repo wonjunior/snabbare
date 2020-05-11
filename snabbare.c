@@ -21,6 +21,7 @@
 #include "Camera.h"
 #include "Forest.h"
 #include "Tree.h"
+#include "HUD.h"
 
 #include <windows.h>
 #include <stdio.h>
@@ -49,9 +50,11 @@ Forest* forest;
 Tree* tree;
 
 Camera camera;
-
+HUD* hud;
 
 bool showNormals;
+bool showTerrain;
+bool showForest;
 
 GLuint grassTexture;
 
@@ -151,9 +154,15 @@ void keyHandler(unsigned char key, int x, int y)
         controls[CTRL_RIGHT] = 1;
         break;
 
-        // terrain nromals
+    // dev
     case 'n':
         showNormals = !showNormals;
+        break;
+    case 'b':
+        showTerrain = !showTerrain;
+        break;
+    case 'v':
+        showForest = !showForest;
         break;
     }
 }
@@ -183,6 +192,8 @@ void init(void)
     dumpInfo();
     camera = createCamera();
     showNormals = false;
+    showTerrain = true;
+    showForest = true;
 
     // GL inits
     glClearColor(0.15, 0.42, 0.70, 0);
@@ -207,12 +218,11 @@ void init(void)
     // ------------------- Load skybox
     skybox = CreateSkybox("models/skybox.obj", "textures/SkyBox512.tga", program);
  
-
     // ------------------- Load models
 
-    subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/frame.obj", "models/tire.obj", "textures/orange.tga");
-
+    subaru = loadCar(program, "models/steering_wheel.obj", "models/steering_wheel.obj", "models/steering_wheel.obj", "models/tire.obj", "textures/orange.tga");
     loadShaderParams(program);
+
 
     GLuint terrainShader = loadShaders("shaders/terrain.vert", "shaders/terrain.frag");
 
@@ -228,6 +238,8 @@ void init(void)
     char* treeFiles[] = {"textures/tree3.tga", "textures/tree1.tga", "textures/tree2.tga"};
     tree = loadTrees(treeFiles, 3, "textures/tree_map.tga", terrain, billboardShader);
     
+    // ------------------- Load HUD
+    hud = loadHUD(billboardShader);
 
     glUseProgram(program);
 }
@@ -281,10 +293,13 @@ void display(void)
     glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
     glUseProgram(program);
     glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
-    DrawTerrain(terrain, modelToWorld);
+    if (showTerrain)
+        DrawTerrain(terrain, modelToWorld);
 
-    if (showNormals)
+    if (showTerrain && showNormals)
         DrawNormals(terrain);
+        
+
 
     glUniformMatrix4fv(glGetUniformLocation(program, "worldToView"), 1, GL_TRUE, worldToView.m);
     glUseProgram(program); // temporary default shader
@@ -292,12 +307,15 @@ void display(void)
     setCarHeight(subaru, terrain);
     drawCar(subaru, camera.mode);
 
-
-    drawForest(forest, worldToView);
+    //if (showForest)
+    //    drawForest(forest, worldToView);
+    //drawForest(forest, worldToView);
+    
     drawTrees(tree, worldToView, camera);
+   
+    drawHUD(hud, camera, worldToView);
+
     glUseProgram(program);
-
-
     glutSwapBuffers();
 }
 
