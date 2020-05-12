@@ -12,6 +12,7 @@ typedef struct {
     Model* frame;
     Model* tire;
     GLuint texture;
+    GLuint tireTexture;
     GLuint shader;
     vec3 pos;
     vec3 direction;
@@ -24,6 +25,7 @@ typedef struct {
     float speed;
     float gas;
     float halfLength;
+    float tireRotationAngle;
 } Car;
 
 

@@ -1,7 +1,7 @@
 #include "Car.h"
 #include <math.h>
 
-Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* frameModel, char* tireModel, char* textureFile)
+Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* frameModel, char* tireModel, char* textureFile, char* tireTexFile)
 {
     Car* car = malloc(sizeof(Car));
     if (car == NULL) {
@@ -19,6 +19,7 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* 
     car->shader = shader;
 
     LoadTGATextureSimple(textureFile, &(car->texture));
+    LoadTGATextureSimple(tireTexFile, &(car->tireTexture));
 
     car->pos.x = 200;
     car->pos.y = 10;
@@ -39,6 +40,7 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* 
     car->speed = 0.05;
     car->gas = 0.0;
     car->steering = 0;
+    car->tireRotationAngle = 0;
     return car;
 }
 
@@ -69,13 +71,17 @@ void drawCar(Car* car, CameraMode cameraMode) {
     else {
         DrawModel(car->frame, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 
+        glBindTexture(GL_TEXTURE_2D, car->tireTexture);
+
         mat4 tireWheelToCar = Mult(T(2.5, 0.9, 4.2), Ry(-0.3 * car->steering));
-        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, tireWheelToCar));
+        modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(car->tireRotationAngle));
+        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
         glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
         DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 
         tireWheelToCar = Mult(T(-2.5, 0.9, 4.2), Ry(3.14 - 0.3 * car->steering));
-        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, tireWheelToCar));
+        modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(-car->tireRotationAngle));
+        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
         glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
         DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
     }
@@ -232,7 +238,7 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
         }
     }
 
-
+    subaru->tireRotationAngle += 5*subaru->speed;
     subaru->pos = VectorAdd(subaru->pos, ScalarMult(Normalize(subaru->direction), subaru->speed));
     subaru->left = Normalize(CrossProduct(subaru->up, subaru->front));
 

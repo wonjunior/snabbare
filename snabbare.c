@@ -222,7 +222,7 @@ void init(void)
  
     // ------------------- Load models
 
-    subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/frame.obj", "models/tire.obj", "textures/orange.tga");
+    subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/frame.obj", "models/tire.obj", "textures/orange.tga", "textures/tire.tga");
     loadShaderParams(program);
 
 
