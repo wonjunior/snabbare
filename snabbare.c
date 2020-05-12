@@ -25,6 +25,7 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 // Globals
 #define PI 3.1415
@@ -220,6 +221,7 @@ void init(void)
     skybox = CreateSkybox("models/skybox.obj", "textures/SkyBox512.tga", program);
  
     // ------------------- Load models
+
     subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/frame.obj", "models/tire.obj", "textures/orange.tga");
     loadShaderParams(program);
 
@@ -230,9 +232,8 @@ void init(void)
 
     loadShaderParams(terrain->shader);
 
-
     GLuint billboardShader = loadShaders("shaders/forest.vert", "shaders/forest.frag");
-    forest = loadForest(terrain->w, "textures/forest_3.tga", billboardShader);
+    forest = loadForest(terrain, "textures/forest_3.tga", billboardShader, 401);
     initBillboardShader(billboardShader);
 
     char* treeFiles[] = {"textures/tree3.tga", "textures/tree1.tga", "textures/tree2.tga"};
@@ -321,6 +322,7 @@ void display(void)
 int main(int argc, char* argv[])
 {
     //PlaySound("c:\\cb.wav", NULL, SND_ASYNC);
+    //delay(2000);
     printf("Snabbare");
     glutInit(&argc, argv);
     glutInitContextVersion(3, 2);

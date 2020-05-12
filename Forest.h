@@ -5,6 +5,7 @@
 #include "loadobj.h"
 #include "LoadTGA.h"
 
+#include "Terrain.h"
 
 typedef struct {
     Model* model;
@@ -12,6 +13,7 @@ typedef struct {
     GLuint shader;
 } Forest;
 
-Forest* loadForest(float xmax, char* fileTexture, GLuint shader);
+GLfloat* generateStakes(int nbStakes, float xmax);
+Forest* loadForest(const Terrain* terrain, char* fileTexture, GLuint shader, int nbStakes);
 void drawForest(Forest* forest, mat4 worldToView);
 

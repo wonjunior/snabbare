@@ -19,8 +19,8 @@ Tree* loadTrees(char** textureFiles, int nbTextures, const char* mapFile, Terrai
 
     //    float texture_size = 100
     float repetitions = 2;
-    float h = 10.8;
-    float width = 6.9;
+    float h = 20;
+    float width = 14;
 
     GLfloat vertices[] =
     {   -width/2, 0.0, 0.0,
