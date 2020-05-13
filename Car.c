@@ -73,13 +73,29 @@ void drawCar(Car* car, CameraMode cameraMode) {
 
         glBindTexture(GL_TEXTURE_2D, car->tireTexture);
 
+        // front-left wheel
         mat4 tireWheelToCar = Mult(T(2.5, 0.9, 4.2), Ry(-0.3 * car->steering));
         modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(car->tireRotationAngle));
         modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
         glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
         DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 
+        // front-right wheel
         tireWheelToCar = Mult(T(-2.5, 0.9, 4.2), Ry(3.14 - 0.3 * car->steering));
+        modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(-car->tireRotationAngle));
+        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
+        glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
+        DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+
+        // back-left wheel
+        tireWheelToCar = T(2.5, 0.9, -4.2);
+        modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(car->tireRotationAngle));
+        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
+        glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
+        DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+
+        // back-right wheel
+        tireWheelToCar = Mult(T(-2.5, 0.9, -4.2), Ry(3.14));
         modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(-car->tireRotationAngle));
         modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
         glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
@@ -238,7 +254,7 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
         }
     }
 
-    subaru->tireRotationAngle += 5*subaru->speed;
+    subaru->tireRotationAngle += subaru->speed / 2.0;
     subaru->pos = VectorAdd(subaru->pos, ScalarMult(Normalize(subaru->direction), subaru->speed));
     subaru->left = Normalize(CrossProduct(subaru->up, subaru->front));
 
