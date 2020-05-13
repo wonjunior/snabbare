@@ -230,6 +230,8 @@ void init(void)
     // ------------------- Load models
     subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/frame.obj", "models/tire.obj", "textures/orange.tga", "textures/tire.tga");
     ghost = createGhost(subaru);
+    vec3 vecteur_null = { 0, 0, 0 };
+    ghost->pos = vecteur_null;
     loadShaderParams(program);
 
     controller = createController(subaru);

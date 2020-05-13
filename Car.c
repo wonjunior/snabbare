@@ -300,10 +300,9 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
 
 void updateGhost(Car* ghost) {
     ghost->tireRotationAngle += 5 * ghost->speed;
-    
+   // ghost->rotation = Mult(ghost->rotation, RotateTowards(ghost->front, ghost->direction));
     ghost->pos = VectorAdd(ghost->pos, ScalarMult(Normalize(ghost->direction), ghost->speed));
     ghost->front = ghost->direction;
-
 }
 
 

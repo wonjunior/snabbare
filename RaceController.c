@@ -92,7 +92,6 @@ void updateController(RaceController* controller, Car* car, Car* ghost) {
             ghost->front = ghost->direction;
             ghost->nextDirection = ghost->direction;
             ghost->speed = sqrt(square(x2 - x1) + square(z2 - z1)) / (float) controller->ghostPath[1].time;
-            exit(0);
             controller->lastGhostStep = 0;
         }
     }
@@ -118,10 +117,11 @@ void updateController(RaceController* controller, Car* car, Car* ghost) {
                 ghost->direction.y = 0;
                 ghost->direction = Normalize(ghost->direction);
                 ghost->speed = sqrt(square(x2 - x1) + square(z2 - z1)) / (float)controller->ghostPath[next].time; 
+                ghost->rotation = Mult(ghost->rotation, RotateTowards(ghost->front, ghost->direction));
             }
             else {
                 controller->nbGhostSteps = 0;
-   
+                ghost->speed = 0;
             }
         }
             
