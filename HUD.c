@@ -86,8 +86,8 @@ void drawHUD(HUD* hud, mat4 worldToView, Camera cam, vec3 carPos)
     DrawModel(hud->minimap.mapBillboard, hud->shader, "inPosition", NULL, "inTexCoord");
 
     // ---------- load map checkpoint
-    float x = 90.0 * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
-    float y = 600.0 * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
+    float x = 89.0 * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
+    float y = 602.0 * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
     mat4 translation = T(-x, y, 0.0);
 
     glUniformMatrix4fv(glGetUniformLocation(hud->shader, "modelviewMatrix"), 1, GL_TRUE, translation.m);

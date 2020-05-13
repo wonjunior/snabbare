@@ -23,6 +23,7 @@
 #include "Tree.h"
 #include "HUD.h"
 #include "RaceController.h"
+#include "Props.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -56,6 +57,7 @@ Tree* tree;
 RaceController controller;
 Camera camera;
 HUD* hud;
+Props* props;
 
 bool showNormals;
 bool showTerrain;
@@ -226,7 +228,6 @@ void init(void)
     skybox = CreateSkybox("models/skybox.obj", "textures/SkyBox512.tga", program);
  
     // ------------------- Load models
-
     subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/frame.obj", "models/tire.obj", "textures/orange.tga", "textures/tire.tga");
     loadShaderParams(program);
 
@@ -235,6 +236,8 @@ void init(void)
     GLuint terrainShader = loadShaders("shaders/terrain.vert", "shaders/terrain.frag");
 
     terrain = GenerateTerrain(terrainShader, "textures/heightmap.tga", "textures/terrain_multitex.tga");
+
+    props = LoadProps(program);
 
     loadShaderParams(terrain->shader);
 
@@ -256,8 +259,6 @@ GLfloat a, b = 0.0;
 
 void display(void)
 {
-   
-    
     //setCarUp(subaru, terrain);
     // clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -312,6 +313,7 @@ void display(void)
     updateCar(subaru, controls, terrain);
     setCarHeight(subaru, terrain);
     drawCar(subaru, camera.mode);
+    drawProps(props);
 
     updateController(&controller, subaru);
 
@@ -323,6 +325,7 @@ void display(void)
     drawHUD(hud, worldToView, camera, subaru->pos);
 
     glUseProgram(program);
+
     glutSwapBuffers();
 }
 

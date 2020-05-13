@@ -21,9 +21,9 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* 
     LoadTGATextureSimple(textureFile, &(car->texture));
     LoadTGATextureSimple(tireTexFile, &(car->tireTexture));
 
-    car->pos.x = 90;
+    car->pos.x = 89;
     car->pos.y = 10;
-    car->pos.z = 600;
+    car->pos.z = 595;
     car->front.x = 0;
     car->front.y = 0;
     car->front.z = 1;
@@ -72,7 +72,7 @@ void drawCar(Car* car, CameraMode cameraMode) {
         DrawModel(car->frame, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 
         glBindTexture(GL_TEXTURE_2D, car->tireTexture);
-
+        
         // front-left wheel
         mat4 tireWheelToCar = Mult(T(2.5, 0.9, 4.2), Ry(-0.3 * car->steering));
         modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(car->tireRotationAngle));

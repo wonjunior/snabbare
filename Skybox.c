@@ -11,7 +11,6 @@ Skybox* CreateSkybox(const char* modelFileName, char* textureFileName, GLuint sh
     return skybox;
 }
 
-
 void DrawSkybox(Skybox* skybox, mat4 worldToView)
 {
     glDisable(GL_DEPTH_TEST);

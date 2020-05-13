@@ -93,6 +93,7 @@
     <ClCompile Include="Skybox.c" />
     <ClCompile Include="snabbare.c" />
     <ClCompile Include="Forest.c" />
+    <ClCompile Include="Props.c" />
     <ClCompile Include="Sphere.c" />
     <ClCompile Include="Terrain.c" />
     <ClCompile Include="Tree.c" />
@@ -105,6 +106,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Car.h" />
     <ClInclude Include="Forest.h" />
+    <ClInclude Include="Props.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="RaceController.h" />
     <ClInclude Include="Skybox.h" />
