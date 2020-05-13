@@ -22,10 +22,14 @@
 #include "Forest.h"
 #include "Tree.h"
 #include "HUD.h"
+#include "RaceController.h"
 
-#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <Windows.h>
+#include <MMSystem.h>
+
 
 // Globals
 #define PI 3.1415
@@ -49,7 +53,7 @@ Skybox* skybox;
 Terrain* terrain;
 Forest* forest;
 Tree* tree;
-
+RaceController controller;
 Camera camera;
 HUD* hud;
 
@@ -192,6 +196,7 @@ void initBillboardShader(GLuint shader)
 void init(void)
 {
     dumpInfo();
+
     camera = createCamera();
     showNormals = false;
     showTerrain = true;
@@ -225,6 +230,7 @@ void init(void)
     subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/frame.obj", "models/tire.obj", "textures/orange.tga", "textures/tire.tga");
     loadShaderParams(program);
 
+    controller = createController();
 
     GLuint terrainShader = loadShaders("shaders/terrain.vert", "shaders/terrain.frag");
 
@@ -307,6 +313,8 @@ void display(void)
     setCarHeight(subaru, terrain);
     drawCar(subaru, camera.mode);
 
+    updateController(&controller, subaru);
+
     if (showForest)
         drawForest(forest, worldToView);
     
@@ -321,18 +329,17 @@ void display(void)
 
 int main(int argc, char* argv[])
 {
-    //PlaySound("c:\\cb.wav", NULL, SND_ASYNC);
-    //delay(2000);
+    PlaySound(TEXT("SystemStart"), NULL, SND_ALIAS);
     printf("Snabbare");
     glutInit(&argc, argv);
-    glutInitContextVersion(3, 2);
-    glutInitWindowSize(1200, 1200);
-    glutCreateWindow("Snabbare");
-#ifdef WIN32
-    glewInit();
-#endif
-    init();
-    glutDisplayFunc(display);
+    glutInitContextVersion(3, 2);    
+    glutInitWindowSize(1200, 1200);  
+    glutCreateWindow("Snabbare");    
+#ifdef WIN32                         
+    glewInit();                      
+#endif                               
+    init();                          
+    glutDisplayFunc(display);        
     glutPassiveMotionFunc(mouseHandler);
     glutKeyboardFunc(keyHandler);
     glutKeyboardUpFunc(keyUpHandler);
