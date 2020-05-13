@@ -21,9 +21,9 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* 
     LoadTGATextureSimple(textureFile, &(car->texture));
     LoadTGATextureSimple(tireTexFile, &(car->tireTexture));
 
-    car->pos.x = 200;
+    car->pos.x = 90;
     car->pos.y = 10;
-    car->pos.z = 200;
+    car->pos.z = 600;
     car->front.x = 0;
     car->front.y = 0;
     car->front.z = 1;

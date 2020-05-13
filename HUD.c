@@ -12,6 +12,7 @@ HUD* loadHUD(GLuint shader, float terrainSize)
     hud->screenResolution = 1.0;
 
     LoadTGATextureSimple("textures/minimap.tga", &(hud->minimap.mapTexture));
+    LoadTGATextureSimple("textures/checkpoint.tga", &(hud->minimap.checkpointTexture));
     LoadTGATextureSimple("textures/car.tga", &(hud->minimap.carTexture));
 
     hud->minimap.size = 0.5;
@@ -28,12 +29,21 @@ HUD* loadHUD(GLuint shader, float terrainSize)
         (a+size/2)/screenResolution,(-a+size/2),0.0f
     };
     
-    size = size / 50.0;
+    size = hud->minimap.size / 50.0;
     GLfloat carVertices[] = {
-        (a-size/2)/screenResolution, (-a-size/2), 0.0f,
-        (a-size/2)/screenResolution, (-a+size/2), 0.0f,
-        (a+size/2)/screenResolution, (-a-size/2), 0.0f,
-        (a+size/2)/screenResolution, (-a+size/2), 0.0f
+        (a - size / 2) / screenResolution, (-a - size / 2), 0.0f,
+        (a - size / 2) / screenResolution, (-a + size / 2), 0.0f,
+        (a + size / 2) / screenResolution, (-a - size / 2), 0.0f,
+        (a + size / 2) / screenResolution, (-a + size / 2), 0.0f
+    };
+
+    float width = hud->minimap.size / 20.0;
+    float height = width / 3;
+    GLfloat checkpointVertices[] = {
+        (a - width) / screenResolution,(-a - height),0.0f,
+        (a - width) / screenResolution,(-a + height),0.0f,
+        (a + width) / screenResolution,(-a - height),0.0f,
+        (a + width) / screenResolution,(-a + height),0.0f
     };
 
     GLuint indices[] = {
@@ -48,8 +58,16 @@ HUD* loadHUD(GLuint shader, float terrainSize)
         0.0, 1.0
     };
 
+    GLfloat checkpointTexCoords[] = {
+        3.0, 0.0,
+        3.0, 1.0,
+        0.0, 0.0,
+        0.0, 1.0
+    };
+
     hud->minimap.mapBillboard = LoadDataToModel(mapVertices, NULL, texCoords, NULL, indices, 4, 3 * 2);
     hud->minimap.carBillboard = LoadDataToModel(carVertices, NULL, texCoords, NULL, indices, 4, 3 * 2);
+    hud->minimap.checkpointBillboard = LoadDataToModel(checkpointVertices, NULL, checkpointTexCoords, NULL, indices, 4, 3 * 2);
 
     return hud;
 }
@@ -67,10 +85,19 @@ void drawHUD(HUD* hud, mat4 worldToView, Camera cam, vec3 carPos)
     glBindTexture(GL_TEXTURE_2D, hud->minimap.mapTexture);
     DrawModel(hud->minimap.mapBillboard, hud->shader, "inPosition", NULL, "inTexCoord");
 
-    // ---------- load car billboard
-    float x = carPos.x * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
-    float y = carPos.z * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
+    // ---------- load map checkpoint
+    float x = 90.0 * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
+    float y = 600.0 * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
     mat4 translation = T(-x, y, 0.0);
+
+    glUniformMatrix4fv(glGetUniformLocation(hud->shader, "modelviewMatrix"), 1, GL_TRUE, translation.m);
+    glBindTexture(GL_TEXTURE_2D, hud->minimap.checkpointTexture);
+    DrawModel(hud->minimap.checkpointBillboard, hud->shader, "inPosition", NULL, "inTexCoord");
+
+    // ---------- load car billboard
+    x = carPos.x * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
+    y = carPos.z * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
+    translation = T(-x, y, 0.0);
 
     glUniformMatrix4fv(glGetUniformLocation(hud->shader, "modelviewMatrix"), 1, GL_TRUE, translation.m);
     glBindTexture(GL_TEXTURE_2D, hud->minimap.carTexture);

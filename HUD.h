@@ -10,8 +10,10 @@
 typedef struct {
     Model* mapBillboard;
     Model* carBillboard;
+    Model* checkpointBillboard;
     GLuint mapTexture;
     GLuint carTexture;
+    GLuint checkpointTexture;
     float size;
     float offset;
     float terrainSize;
