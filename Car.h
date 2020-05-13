@@ -20,6 +20,7 @@ typedef struct {
     vec3 up;
     vec3 left;
     vec3 speedVec;
+    vec3 nextDirection;
     mat4 rotation;
     float steering;
     float speed;
@@ -37,8 +38,10 @@ enum { CTRL_GAS, CTRL_BRAKE, CTRL_LEFT, CTRL_RIGHT };
 
 
 void updateCar(Car* subaru, const char* controls, Terrain* terrain);
+void updateGhost(Car* ghost);
 
 Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* frameModel, char* tireModel, char* textureFile);
+Car* createGhost(const Car* car);
 void drawCar(Car* car, CameraMode cameraMode);
 void setCarHeight(Car* car, Terrain* terrain);
 void setCarUp(Car* car, Terrain* terrain);

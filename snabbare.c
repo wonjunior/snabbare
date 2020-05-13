@@ -65,7 +65,7 @@ bool showForest;
 
 GLuint grassTexture;
 
-Car* subaru;
+Car *subaru, *ghost;
 
 GLfloat projectionMatrix[] =
 {
@@ -229,9 +229,10 @@ void init(void)
  
     // ------------------- Load models
     subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/frame.obj", "models/tire.obj", "textures/orange.tga", "textures/tire.tga");
+    ghost = createGhost(subaru);
     loadShaderParams(program);
 
-    controller = createController();
+    controller = createController(subaru);
 
     GLuint terrainShader = loadShaders("shaders/terrain.vert", "shaders/terrain.frag");
 
@@ -310,12 +311,20 @@ void display(void)
 
     glUniformMatrix4fv(glGetUniformLocation(program, "worldToView"), 1, GL_TRUE, worldToView.m);
     glUseProgram(program); // temporary default shader
+ 
     updateCar(subaru, controls, terrain);
+    updateGhost(ghost);
+    
+    
     setCarHeight(subaru, terrain);
+    setCarHeight(ghost, terrain);
     drawCar(subaru, camera.mode);
-    drawProps(props);
 
-    updateController(&controller, subaru);
+    drawProps(props);
+    drawCar(ghost, CAM_BEHIND);
+
+
+    updateController(&controller, subaru, ghost);
 
     if (showForest)
         drawForest(forest, worldToView);

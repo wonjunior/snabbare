@@ -44,6 +44,42 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* 
     return car;
 }
 
+Car* createGhost(const Car* car) {
+    Car* ghost = malloc(sizeof(Car));
+
+    ghost->cockpit = car->cockpit;
+    ghost->steeringWheel = car->steeringWheel;
+    ghost->frame = car->frame;
+    ghost->tire = car->tire;
+
+    ghost->shader = car->shader;
+
+    ghost->texture = car->texture;
+    ghost->tireTexture = car->tireTexture;
+
+    ghost->pos.x = 200;
+    ghost->pos.y = 10;
+    ghost->pos.z = 200;
+    ghost->front.x = 0;
+    ghost->front.y = 0;
+    ghost->front.z = 1;
+    ghost->direction.x = 0;
+    ghost->direction.y = 0;
+    ghost->direction.z = 0.5;
+    ghost->up.x = 0;
+    ghost->up.y = 1;
+    ghost->up.z = 0;
+    ghost->left.x = 1;
+    ghost->left.y = 0;
+    ghost->left.z = 0;
+    ghost->rotation = IdentityMatrix();
+    ghost->speed = 0;
+    ghost->gas = 0.0;
+    ghost->steering = 0;
+    ghost->tireRotationAngle = 0;
+    return ghost;
+}
+
 void drawCar(Car* car, CameraMode cameraMode) {
 
     //texture
@@ -259,6 +295,14 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
     subaru->left = Normalize(CrossProduct(subaru->up, subaru->front));
 
     handleCollisions(subaru, terrain);
+
+}
+
+void updateGhost(Car* ghost) {
+    ghost->tireRotationAngle += 5 * ghost->speed;
+    
+    ghost->pos = VectorAdd(ghost->pos, ScalarMult(Normalize(ghost->direction), ghost->speed));
+    ghost->front = ghost->direction;
 
 }
 
