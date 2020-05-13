@@ -8,6 +8,7 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* 
         printf("Failed to allocate memory for Car struct (loadCar)");
     }
 
+    car->transparent = false;
     car->cockpit = LoadModelPlus(cockpitModel);
     car->steeringWheel = LoadModelPlus(steeringWheelModel);
     car->frame = LoadModelPlus(frameModel);
@@ -47,6 +48,7 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* 
 Car* createGhost(const Car* car) {
     Car* ghost = malloc(sizeof(Car));
 
+    ghost->transparent = true;
     ghost->cockpit = car->cockpit;
     ghost->steeringWheel = car->steeringWheel;
     ghost->frame = car->frame;
@@ -80,62 +82,86 @@ Car* createGhost(const Car* car) {
     return ghost;
 }
 
-void drawCar(Car* car, CameraMode cameraMode) {
-
-    //texture
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, car->texture);
-    //glUniform1i(glGetUniformLocation(car->shader, "texUnit"), 0);
-
-    car->front = car->direction;
-    // vec3 halfCarSize = { 0, 0, 5 };
-    // mat4 midToBack = T(halfCarSize.x, halfCarSize.y, halfCarSize.z);
-    // mat4 modelToWorld = Mult(car->rotation, midToBack);
+void renderCockpit(Car* car) 
+{
+    // ---------- cockpit
     mat4 modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), car->rotation);
-
     glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
 
-    if (cameraMode == CAM_COCKPIT) {
-        DrawModel(car->cockpit, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, car->texture);
+    DrawModel(car->cockpit, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 
-        float angle = car->steering > 0 ? (car->steering < 0.2 ? 0 : car->steering) : (-car->steering < 0.2 ? 0 : car->steering);
-        mat4 steeringWheelToCar = Mult(T(1.1, 2.7, 1.3), Mult(Rx(0.4), Rz(0.6*angle)));
-        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, steeringWheelToCar));
-        glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
-        DrawModel(car->steeringWheel, car->shader, "in_Position", "in_Normal", "in_TexCoord");
-    }
-    else {
-        DrawModel(car->frame, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+    // ---------- steering wheel
+    float angle = car->steering > 0 ? (car->steering < 0.2 ? 0 : car->steering) : (-car->steering < 0.2 ? 0 : car->steering);
+    mat4 steeringWheelToCar = Mult(T(1.1, 2.7, 1.3), Mult(Rx(0.4), Rz(0.6 * angle)));
+    modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), Mult(car->rotation, steeringWheelToCar));
+    glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
 
-        glBindTexture(GL_TEXTURE_2D, car->tireTexture);
-        
-        // front-left wheel
-        mat4 tireWheelToCar = Mult(T(2.5, 0.9, 4.2), Ry(-0.3 * car->steering));
-        modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(car->tireRotationAngle));
-        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
-        glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
-        DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+    DrawModel(car->steeringWheel, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+}
 
-        // front-right wheel
-        tireWheelToCar = Mult(T(-2.5, 0.9, 4.2), Ry(3.14 - 0.3 * car->steering));
-        modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(-car->tireRotationAngle));
-        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
-        glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
-        DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+void renderFrame(Car* car)
+{
+    // ---------- frame
+    mat4 modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), car->rotation);
+    glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
 
-        // back-left wheel
-        tireWheelToCar = T(2.5, 0.9, -4.2);
-        modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(car->tireRotationAngle));
-        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
-        glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
-        DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, car->texture);
+    DrawModel(car->frame, car->shader, "in_Position", "in_Normal", "in_TexCoord");
 
-        // back-right wheel
-        tireWheelToCar = Mult(T(-2.5, 0.9, -4.2), Ry(3.14));
-        modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(-car->tireRotationAngle));
-        modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
-        glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
-        DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+    glBindTexture(GL_TEXTURE_2D, car->tireTexture);
+
+    // ---------- font-left wheel
+    mat4 tireWheelToCar = Mult(T(2.5, 0.9, 4.2), Ry(-0.3 * car->steering));
+    modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(car->tireRotationAngle));
+    modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
+    glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
+    DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+
+    // ---------- front-right wheel
+    tireWheelToCar = Mult(T(-2.5, 0.9, 4.2), Ry(3.14 - 0.3 * car->steering));
+    modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(-car->tireRotationAngle));
+    modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
+    glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
+    DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+
+    // ---------- back-left wheel
+    tireWheelToCar = T(2.5, 0.9, -4.2);
+    modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(car->tireRotationAngle));
+    modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
+    glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
+    DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+
+    // ---------- back-right wheel
+    tireWheelToCar = Mult(T(-2.5, 0.9, -4.2), Ry(3.14));
+    modelToWorld = Mult(Mult(car->rotation, tireWheelToCar), Rx(-car->tireRotationAngle));
+    modelToWorld = Mult(T(car->pos.x, car->pos.y, car->pos.z), modelToWorld);
+    glUniformMatrix4fv(glGetUniformLocation(car->shader, "modelToWorld"), 1, GL_TRUE, modelToWorld.m);
+    DrawModel(car->tire, car->shader, "in_Position", "in_Normal", "in_TexCoord");
+}
+
+void renderFrameTransparent(Car* car) {
+    glUniform1ui(glGetUniformLocation(car->shader, "enableTransparency"), true);
+    glCullFace(GL_FRONT);
+    renderFrame(car);
+    glCullFace(GL_BACK);
+    renderFrame(car);
+    glUniform1ui(glGetUniformLocation(car->shader, "enableTransparency"), false);
+}
+
+void drawCar(Car* car, CameraMode cameraMode) {
+    car->front = car->direction;
+    
+    if (cameraMode == CAM_COCKPIT)
+        renderCockpit(car);
+    else
+    {
+        if(car->transparent)
+            renderFrameTransparent(car);
+        else
+            renderFrame(car);
     }
 }
 

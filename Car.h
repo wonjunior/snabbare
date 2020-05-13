@@ -27,6 +27,7 @@ typedef struct {
     float gas;
     float halfLength;
     float tireRotationAngle;
+    int transparent;
 } Car;
 
 
@@ -42,7 +43,13 @@ void updateGhost(Car* ghost);
 
 Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* frameModel, char* tireModel, char* textureFile);
 Car* createGhost(const Car* car);
+
+// render functions
 void drawCar(Car* car, CameraMode cameraMode);
+void renderCockpit(Car* car);
+void renderFrame(Car* car);
+void renderFrameTransparent(Car* car);
+
 void setCarHeight(Car* car, Terrain* terrain);
 void setCarUp(Car* car, Terrain* terrain);
 void updateCar(Car* subaru);
