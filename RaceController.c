@@ -15,6 +15,8 @@ RaceController createController(const Car* car) {
         510, 171,
     };
     RaceController controller;
+
+    controller.started = false;
     controller.checkPointsRadius = 70;
     controller.nbCheckPoints = 7;
     controller.nextCheckPoint = 1;

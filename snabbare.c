@@ -228,7 +228,7 @@ void init(void)
     skybox = CreateSkybox("models/skybox.obj", "textures/SkyBox512.tga", program);
  
     // ------------------- Load models
-    subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/frame.obj", "models/tire.obj", "textures/orange.tga", "textures/tire.tga");
+    subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/jeep.obj", "models/tire.obj", "textures/jeep.tga", "textures/tire.tga");
     ghost = createGhost(subaru);
     vec3 vecteur_null = { 0, 0, 0 };
     ghost->pos = vecteur_null;
@@ -325,15 +325,15 @@ void display(void)
     drawProps(props);
     drawCar(ghost, CAM_BEHIND);
 
-
-    updateController(&controller, subaru, ghost);
+    if (controller.started || (controller.started = controls[CTRL_GAS]))
+        updateController(&controller, subaru, ghost);
 
     if (showForest)
         drawForest(forest, worldToView);
     
     drawTrees(tree, worldToView, camera);
    
-    drawHUD(hud, worldToView, camera, subaru->pos);
+    drawHUD(hud, worldToView, camera, subaru->pos, ghost->pos);
 
     glUseProgram(program);
 

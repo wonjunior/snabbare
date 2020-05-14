@@ -16,6 +16,7 @@ typedef struct {
 
 
 typedef struct {
+    int started;
     int lap;
     float checkPointsRadius;
     GLfloat* checkPoints;
