@@ -1,5 +1,6 @@
 #include "Tree.h"
 
+float angleBetween(float x1, float z1, float x2, float z2);
 
 Tree* loadTrees(char** textureFiles, int nbTextures, const char* mapFile, Terrain* terrain, GLuint shader) {
 
@@ -63,12 +64,13 @@ void drawTrees(Tree* tree, mat4 worldToView, const Camera camera) {
         glBindTexture(GL_TEXTURE_2D, tree->textures[i % tree->nbTextures]);
         new_normal = VectorSub(camera.pos, tree->pos[i]);
         new_normal.y = 0;
-        new_normal = Normalize(new_normal);
+        /*new_normal = Normalize(new_normal);
         cos_angle = DotProduct(new_normal, old_normal);
         sin_angle = DotProduct(CrossProduct(new_normal, old_normal), up);
         angle = acos(cos_angle);
         if (sin_angle > 0)
-            angle *= -1;
+            angle *= -1;*/
+        angle = angleBetween(old_normal.x, old_normal.z, new_normal.x, new_normal.z);
         rot = Ry(angle);
 
        // rot = RotateTowards(old_normal, new_normal);

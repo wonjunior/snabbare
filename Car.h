@@ -20,7 +20,6 @@ typedef struct {
     vec3 up;
     vec3 left;
     vec3 speedVec;
-    vec3 nextDirection;
     mat4 rotation;
     float steering;
     float speed;
@@ -28,6 +27,8 @@ typedef struct {
     float halfLength;
     float tireRotationAngle;
     int transparent;
+    float rotationSpeed;
+    float angle;
 } Car;
 
 

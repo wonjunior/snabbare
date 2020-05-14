@@ -48,8 +48,8 @@ Car* loadCar(GLuint shader, char* cockpitModel, char* steeringWheelModel, char* 
 Car* createGhost(const Car* car) {
     Car* ghost = malloc(sizeof(Car));
 
+
     ghost->transparent = true;
-    ghost->cockpit = car->cockpit;
     ghost->steeringWheel = car->steeringWheel;
     ghost->frame = car->frame;
     ghost->tire = car->tire;
@@ -79,6 +79,8 @@ Car* createGhost(const Car* car) {
     ghost->gas = 0.0;
     ghost->steering = 0;
     ghost->tireRotationAngle = 0;
+    ghost->rotationSpeed = 0;
+    ghost->angle = 0;
     return ghost;
 }
 
@@ -324,11 +326,12 @@ void updateCar(Car* subaru, const char* controls, Terrain* terrain)
 
 }
 
+
 void updateGhost(Car* ghost) {
     ghost->tireRotationAngle += 5 * ghost->speed;
-   // ghost->rotation = Mult(ghost->rotation, RotateTowards(ghost->front, ghost->direction));
+    ghost->angle += ghost->rotationSpeed;
+    ghost->rotation = Ry(ghost->angle);
     ghost->pos = VectorAdd(ghost->pos, ScalarMult(Normalize(ghost->direction), ghost->speed));
-    ghost->front = ghost->direction;
 }
 
 
