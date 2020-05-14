@@ -13,6 +13,7 @@ typedef struct {
     Model* checkpointBillboard;
     GLuint mapTexture;
     GLuint carTexture;
+    GLuint ghostTexture;
     GLuint checkpointTexture;
     float size;
     float offset;

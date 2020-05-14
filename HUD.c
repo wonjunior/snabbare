@@ -13,7 +13,8 @@ HUD* loadHUD(GLuint shader, float terrainSize)
 
     LoadTGATextureSimple("textures/minimap.tga", &(hud->minimap.mapTexture));
     LoadTGATextureSimple("textures/checkpoint.tga", &(hud->minimap.checkpointTexture));
-    LoadTGATextureSimple("textures/car.tga", &(hud->minimap.carTexture));
+    LoadTGATextureSimple("textures/car2.tga", &(hud->minimap.carTexture));
+    LoadTGATextureSimple("textures/car.tga", &(hud->minimap.ghostTexture));
 
     hud->minimap.size = 0.5;
     hud->minimap.offset = 0.5;
@@ -72,7 +73,7 @@ HUD* loadHUD(GLuint shader, float terrainSize)
     return hud;
 }
 
-void drawHUD(HUD* hud, mat4 worldToView, Camera cam, vec3 carPos)
+void drawHUD(HUD* hud, mat4 worldToView, Camera cam, vec3 carPos, vec3 ghostPos)
 {
     glUseProgram(hud->shader);
     glActiveTexture(GL_TEXTURE0);
@@ -103,7 +104,17 @@ void drawHUD(HUD* hud, mat4 worldToView, Camera cam, vec3 carPos)
     glBindTexture(GL_TEXTURE_2D, hud->minimap.carTexture);
     DrawModel(hud->minimap.carBillboard, hud->shader, "inPosition", NULL, "inTexCoord");
 
+    // ---------- load ghost billboard
+    if (ghostPos.x != 0.0 && ghostPos.z != 0) {
+        x = ghostPos.x * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
+        y = ghostPos.z * hud->minimap.size / hud->minimap.terrainSize - hud->minimap.size / 2;
+        translation = T(-x, y, 0.0);
 
+        glUniformMatrix4fv(glGetUniformLocation(hud->shader, "modelviewMatrix"), 1, GL_TRUE, translation.m);
+        glBindTexture(GL_TEXTURE_2D, hud->minimap.ghostTexture);
+        DrawModel(hud->minimap.carBillboard, hud->shader, "inPosition", NULL, "inTexCoord");
+    }
+    
     glEnable(GL_DEPTH_TEST);
     glUniform1ui(glGetUniformLocation(hud->shader, "ACTIVE_HUD"), 0);
 }
