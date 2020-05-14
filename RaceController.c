@@ -6,13 +6,22 @@ float square(float a) {
 
 RaceController createController(const Car* car) {
     GLfloat points[] = {
-        133, 410,
-        69, 866,
-        554, 923,
-        770, 853,
-        894, 717,
-        928, 405,
-        510, 171,
+        89, 602,
+        67, 868,
+        775, 864,
+        933, 407,
+        697, 300,
+        511, 173,
+        134, 413
+    };
+    GLfloat radius[] = {
+        15,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
     };
     RaceController controller;
 
@@ -27,16 +36,18 @@ RaceController createController(const Car* car) {
     controller.carLoopCounter = 0;
     controller.ghostLoopCounter = 0;
 
-    controller.carPath = malloc(500 * sizeof(Step));
-    controller.ghostPath = malloc(500 * sizeof(Step));
+    controller.carPath = malloc(300 * sizeof(Step));
+    controller.ghostPath = malloc(300 * sizeof(Step));
 
     controller.carPath[0].pos[0] = car->pos.x;
     controller.carPath[0].pos[1] = car->pos.z;
     controller.carPath[0].time = 0;
 
-    controller.checkPoints = malloc(2 * controller.nbCheckPoints * sizeof(GLfloat));
-    for (int i = 0;i < 2*controller.nbCheckPoints;i++) {
-        controller.checkPoints[i] = points[i];
+    controller.checkPoints = malloc(controller.nbCheckPoints * sizeof(Checkpoint));
+    for (int i = 0;i < controller.nbCheckPoints;i++) {
+        controller.checkPoints[i].pos[0] = points[2*i];
+        controller.checkPoints[i].pos[1] = points[2 * i + 1];
+        controller.checkPoints[i].r = radius[i];
     }
 
     return controller;
@@ -70,9 +81,10 @@ void updateController(RaceController* controller, Car* car, Car* ghost) {
     }
 
     //Checkpoints
-    float checkpoint_x = controller->checkPoints[2 * controller->nextCheckPoint];
-    float checkpoint_z = controller->checkPoints[2 * controller->nextCheckPoint + 1];
-    if (square(car->pos.x - checkpoint_x) + square(car->pos.z - checkpoint_z) < square(controller->checkPointsRadius)) {
+    float checkpoint_x = controller->checkPoints[controller->nextCheckPoint].pos[0];
+    float checkpoint_z = controller->checkPoints[controller->nextCheckPoint].pos[1];
+    float r            = controller->checkPoints[controller->nextCheckPoint].r;
+    if (square(car->pos.x - checkpoint_x) + square(car->pos.z - checkpoint_z) <= square(r)) {
         controller->nextCheckPoint++;
         controller->nextCheckPoint %= controller->nbCheckPoints;
         
@@ -100,7 +112,7 @@ void updateController(RaceController* controller, Car* car, Car* ghost) {
             float x3 = controller->ghostPath[2].pos[0];
             float z3 = controller->ghostPath[2].pos[1];
             ghost->rotationSpeed = angleBetween(x2 - x1, z2 - z1, x3 - x2, z3 - z2) / (float)controller->ghostPath[1].time;
-            //ghost->angle = 
+            ghost->angle = 0;
             ghost->pos.x = x1;
             ghost->pos.z = z1;
             ghost->direction.x = x2 - x1;

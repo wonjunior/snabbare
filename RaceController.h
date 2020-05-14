@@ -14,12 +14,17 @@ typedef struct {
     GLfloat pos[2];
 } Step;
 
+typedef struct {
+    GLfloat r;
+    GLfloat pos[2];
+} Checkpoint;
+
 
 typedef struct {
     int started;
     int lap;
     float checkPointsRadius;
-    GLfloat* checkPoints;
+    Checkpoint* checkPoints;
     int nbCheckPoints;
     int nextCheckPoint;
     Step* carPath;
