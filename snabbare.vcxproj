@@ -99,10 +99,6 @@
     <ClCompile Include="Tree.c" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="lab4-6.frag" />
-    <None Include="lab4-6.vert" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Car.h" />
     <ClInclude Include="Forest.h" />

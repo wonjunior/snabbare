@@ -216,7 +216,7 @@ void init(void)
     
 
     // Load and compile shader
-    program = loadShaders("lab4-6.vert", "lab4-6.frag");
+    program = loadShaders("shaders/main.vert", "shaders/main.frag");
     glUseProgram(program); // default shader
 
     // ------------------- textures loading
@@ -244,7 +244,7 @@ void init(void)
 
     loadShaderParams(terrain->shader);
 
-    GLuint billboardShader = loadShaders("shaders/forest.vert", "shaders/forest.frag");
+    GLuint billboardShader = loadShaders("shaders/billboard.vert", "shaders/billboard.frag");
     forest = loadForest(terrain, "textures/forest_3.tga", billboardShader, 401);
     initBillboardShader(billboardShader);
 
