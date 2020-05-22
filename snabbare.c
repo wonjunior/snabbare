@@ -173,7 +173,7 @@ void keyHandler(unsigned char key, int x, int y)
 }
 
 
-void initMainShader(GLuint shader) 
+void initShaderParams(GLuint shader) 
 {
     // Projection
     glUniformMatrix4fv(glGetUniformLocation(shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix);
@@ -229,7 +229,7 @@ void init(void)
     ghost = createGhost(subaru);
     vec3 null_vector = { 0, 0, 0 };
     ghost->pos = null_vector;
-    initMainShader(program);
+    initShaderParams(program);
 
     controller = createController(subaru);
 
@@ -239,7 +239,7 @@ void init(void)
 
     props = LoadProps(program);
 
-    initMainShader(terrain->shader);
+    initShaderParams(terrain->shader);
 
     GLuint billboardShader = loadShaders("shaders/billboard.vert", "shaders/billboard.frag");
     forest = loadForest(terrain, "textures/forest_3.tga", billboardShader, 401);
