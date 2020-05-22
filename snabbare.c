@@ -124,13 +124,13 @@ void keyUpHandler(unsigned char key, int x, int y) {
     switch (key)
     {
             // car control
-        case 'z':
+        case 'w':
             controls[CTRL_GAS] = 0;
             break;
         case 's':
             controls[CTRL_BRAKE] = 0;
             break;
-        case 'q':
+        case 'a':
             controls[CTRL_LEFT] = 0;
             break;
         case 'd':
@@ -145,14 +145,14 @@ void keyHandler(unsigned char key, int x, int y)
 
     switch (key) {
 
-        // car control
-    case 'z':
+     // car control
+    case 'w':
         controls[CTRL_GAS] = 1;
         break;
     case 's':
         controls[CTRL_BRAKE] = 1;
         break;
-    case 'q':
+    case 'a':
         controls[CTRL_LEFT] = 1;
         break;
     case 'd':
@@ -173,10 +173,9 @@ void keyHandler(unsigned char key, int x, int y)
 }
 
 
-void loadShaderParams(GLuint shader) 
+void initMainShader(GLuint shader) 
 {
     // Projection
-
     glUniformMatrix4fv(glGetUniformLocation(shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix);
     // Lighting
     glUniform3fv(glGetUniformLocation(shader, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
@@ -189,6 +188,7 @@ void loadShaderParams(GLuint shader)
 void initBillboardShader(GLuint shader)
 {
     glUniform1ui(glGetUniformLocation(shader, "ACTIVE_HUD"), 0);
+    // Projection
     glUniformMatrix4fv(glGetUniformLocation(shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix);
     glUniform1i(glGetUniformLocation(shader, "texUnit"), 0);
 }
@@ -212,14 +212,13 @@ void init(void)
     glEnable(GL_BLEND);
 
     
-
     // Load and compile shader
     program = loadShaders("shaders/main.vert", "shaders/main.frag");
     glUseProgram(program); // default shader
 
     // ------------------- textures loading
     LoadTGATextureSimple("textures/concrete.tga", &grassTexture);
-    glUniform1i(glGetUniformLocation(program, "texUnit"), 0); 		// Texture unit 0
+    glUniform1i(glGetUniformLocation(program, "texUnit"), 0);
     glActiveTexture(GL_TEXTURE0);
 
     // ------------------- Load skybox
@@ -228,9 +227,9 @@ void init(void)
     // ------------------- Load models
     subaru = loadCar(program, "models/cockpit.obj", "models/steering_wheel.obj", "models/jeep.obj", "models/tire.obj", "textures/jeep.tga", "textures/tire.tga");
     ghost = createGhost(subaru);
-    vec3 vecteur_null = { 0, 0, 0 };
-    ghost->pos = vecteur_null;
-    loadShaderParams(program);
+    vec3 null_vector = { 0, 0, 0 };
+    ghost->pos = null_vector;
+    initMainShader(program);
 
     controller = createController(subaru);
 
@@ -240,7 +239,7 @@ void init(void)
 
     props = LoadProps(program);
 
-    loadShaderParams(terrain->shader);
+    initMainShader(terrain->shader);
 
     GLuint billboardShader = loadShaders("shaders/billboard.vert", "shaders/billboard.frag");
     forest = loadForest(terrain, "textures/forest_3.tga", billboardShader, 401);
@@ -255,12 +254,11 @@ void init(void)
     glUseProgram(program);
 }
 
-GLfloat a, b = 0.0;
+//GLfloat a, b = 0.0;
 
 
 void display(void)
 {
-    //setCarUp(subaru, terrain);
     // clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -284,16 +282,10 @@ void display(void)
     // -------- Draw skybox
     DrawSkybox(skybox, worldToView);
     
-
-
-    // -------- Draw terrain
-    //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, grassTexture);
-
     glUniformMatrix4fv(glGetUniformLocation(terrain->shader, "worldToView"), 1, GL_TRUE, worldToView.m);
 
+    // update light source
     vec3 carLightPos = { 0,0,0 };
-    //light updtae
     
     lightSourcesDirectionsPositions[0].x = camera.pos.x;
     lightSourcesDirectionsPositions[0].y = camera.pos.y;
@@ -302,6 +294,7 @@ void display(void)
     glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
     glUseProgram(program);
     glUniform3fv(glGetUniformLocation(terrain->shader, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
+    
     if (showTerrain)
         DrawTerrain(terrain, modelToWorld);
 
@@ -355,7 +348,6 @@ int main(int argc, char* argv[])
     glutKeyboardFunc(keyHandler);
     glutKeyboardUpFunc(keyUpHandler);
     glutRepeatingTimer(20);
-    //glutTimerFunc(20, &OnTimer, 0);
 
     glutMainLoop();
     exit(0);
