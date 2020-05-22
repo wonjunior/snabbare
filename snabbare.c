@@ -28,8 +28,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <Windows.h>
-#include <MMSystem.h>
 
 
 // Globals
@@ -343,7 +341,6 @@ void display(void)
 
 int main(int argc, char* argv[])
 {
-    PlaySound(TEXT("SystemStart"), NULL, SND_ALIAS);
     printf("Snabbare");
     glutInit(&argc, argv);
     glutInitContextVersion(3, 2);    
