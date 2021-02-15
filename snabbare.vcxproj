@@ -104,9 +104,18 @@
     <ClInclude Include="Props.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="RaceController.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="Tree.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Icon1.ico" />
+    <Image Include="icon2.ico" />
+    <Image Include="voiture.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -124,16 +124,16 @@ void keyUpHandler(unsigned char key, int x, int y) {
     switch (key)
     {
             // car control
-        case 'w':
+        case 'v':
             controls[CTRL_GAS] = 0;
             break;
-        case 's':
+        case 'b':
             controls[CTRL_BRAKE] = 0;
             break;
-        case 'a':
+        case 'w':
             controls[CTRL_LEFT] = 0;
             break;
-        case 'd':
+        case 'x':
             controls[CTRL_RIGHT] = 0;
             break;
     }
@@ -146,16 +146,16 @@ void keyHandler(unsigned char key, int x, int y)
     switch (key) {
 
      // car control
-    case 'w':
+    case 'v':
         controls[CTRL_GAS] = 1;
         break;
-    case 's':
+    case 'b':
         controls[CTRL_BRAKE] = 1;
         break;
-    case 'a':
+    case 'w':
         controls[CTRL_LEFT] = 1;
         break;
-    case 'd':
+    case 'x':
         controls[CTRL_RIGHT] = 1;
         break;
 
@@ -163,10 +163,10 @@ void keyHandler(unsigned char key, int x, int y)
     case 'n':
         showNormals = !showNormals;
         break;
-    case 'b':
+    case 't':
         showTerrain = !showTerrain;
         break;
-    case 'v':
+    case 'f':
         showForest = !showForest;
         break;
     }
